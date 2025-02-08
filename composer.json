@@ -1,0 +1,32 @@
+{
+  "name": "northrook/view-element",
+  "description": "Generate HTML elements and their attributes.",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "Core\\View\\": "src"
+    }
+  },
+  "authors": [
+    {
+      "name": "Martin",
+      "email": "mn@northrook.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require": {
+    "php": ">=8.3",
+    "ext-dom": "*",
+    "ext-libxml": "*"
+  },
+  "require-dev": {
+    "northrook/php-cs": "dev-main",
+    "tracy/tracy": "*",
+    "northrook/support": "dev-main"
+  },
+  "scripts": {
+    "phpstan": "vendor/bin/phpstan analyse"
+  }
+}
