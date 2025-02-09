@@ -6,9 +6,7 @@ namespace Core\View\Element;
 
 use Core\View\Element\Attributes\{ClassAttribute, StyleAttribute};
 use Support\Normalize;
-use InvalidArgumentException;
-use LogicException;
-use Stringable;
+use Stringable, InvalidArgumentException, LogicException;
 
 /**
  * @property-read ClassAttribute                                                                          $class

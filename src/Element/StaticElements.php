@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use Core\View\Element;
-use InvalidArgumentException;
 use Support\Escape;
+use InvalidArgumentException;
 
 trait StaticElements
 {

@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace Core\View;
 
 use Core\View\Element\{Attributes, Content, StaticElements, Tag};
+use Core\Interface\View;
 use Stringable;
 
-class Element implements Stringable
+class Element extends View
 {
     use StaticElements;
 
