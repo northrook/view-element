@@ -146,11 +146,9 @@ final class Attributes implements Stringable
 
         // Convert types to string
         return match ( \gettype( $value ) ) {
-            'string'  => $value,
             'boolean' => $value ? 'true' : 'false',
-            'object'  => \method_exists( $value, '__toString' ) ? $value->__toString() : null,
-            'NULL'    => null,
-            default   => (string) $value,
+            'string'  => $value ?: null,
+            default   => null,
         };
     }
 
@@ -313,8 +311,12 @@ final class Attributes implements Stringable
                 continue;
             }
 
+            if ( \is_int( $value ) ) {
+                $value = (string) $value;
+            }
+
             \assert(
-                \is_string( $value ) || \is_null( $value ) || \is_bool( $value ) || \is_numeric( $value ),
+                \is_string( $value ) || \is_null( $value ) || \is_bool( $value ),
                 "Attribute '{$name}' can only be null|string|bool. ".\gettype( $value ).' provided.',
             );
 
