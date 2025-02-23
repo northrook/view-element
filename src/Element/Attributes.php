@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use Core\View\Element\Attributes\{ClassAttribute, StyleAttribute};
-use Support\Normalize;
 use Stringable, InvalidArgumentException, LogicException;
+use function Support\slug;
 
 /**
  * @property-read ClassAttribute                                                                          $class
@@ -266,7 +266,7 @@ final class Attributes implements Stringable
                     \is_string( $value ),
                     "Attribute '{$name}' can only be string. ".\gettype( $value ).' provided.',
                 );
-                $this->attributes[$name] = Normalize::key( $value );
+                $this->attributes[$name] = slug( $value );
 
                 continue;
             }

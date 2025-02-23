@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use Stringable;
-use Support\Normalize;
+use function Support\normalizeWhitespace;
 
 final class Content implements Stringable
 {
@@ -63,6 +63,6 @@ final class Content implements Stringable
     {
         $textContent = \strip_tags( \implode( ' ', $this->content ) );
 
-        return $normalize ? Normalize::whitespace( $textContent ) : $textContent;
+        return $normalize ? normalizeWhitespace( $textContent ) : $textContent;
     }
 }
