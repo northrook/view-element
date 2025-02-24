@@ -17,9 +17,7 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=8.3",
-    "ext-dom": "*",
-    "ext-libxml": "*"
+    "php": ">=8.3"
   },
   "require-dev": {
     "northrook/dev": "dev-main",
