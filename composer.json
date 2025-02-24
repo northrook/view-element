@@ -22,8 +22,7 @@
     "ext-libxml": "*"
   },
   "require-dev": {
-    "northrook/php-cs": "dev-main",
-    "tracy/tracy": "*",
+    "northrook/dev": "dev-main",
     "northrook/support": "dev-main",
     "latte/latte": "^3.0"
   },

@@ -54,6 +54,62 @@ final class Attributes implements Stringable
     }
 
     /**
+     * Extracts attributes from an HTML string.
+     *
+     * - Parses only the first element
+     *
+     * @param string $html
+     * @param bool   $unwrap
+     *
+     * @return Attributes
+     */
+    public static function extract( string &$html, bool $unwrap = false ) : Attributes
+    {
+        if ( ! \preg_match( '/^<(\w+)([^>]*)>/', $html, $matches ) ) {
+            return new self();
+        }
+
+        [$elementSubstring, $tagName, $attributesString] = $matches;
+
+        if ( $unwrap ) {
+            $html = \mb_substr( $html, \mb_strlen( $elementSubstring ) );
+
+            if ( \str_ends_with( $html, "</{$tagName}>" ) ) {
+                $html = \mb_substr( $html, 0, -\mb_strlen( "</{$tagName}>" ) );
+            }
+
+            $html = \trim( $html );
+        }
+
+        $attributes = [];
+
+        if ( ! $attributesString ) {
+            return new self();
+        }
+
+        if ( \preg_match_all(
+            '#([\w_-]+?)\s*=\s*["\'`](.*?\s*)["\'`]|(\w+)#',
+            // '/(\w+)(?:\s*=\s*"([^"]*)"|\s*=\s*\'([^\']*)\'|\s*=\s*([^\s>]+))?/',
+            $attributesString,
+            $attrMatches,
+            PREG_SET_ORDER,
+        ) ) {
+            foreach ( $attrMatches as $attr ) {
+                $name  = ( $attr[1] ?? false ) ?: $attr[3] ?? null;
+                $value = ( $attr[2] ?? false ) ?: $name;
+
+                if ( ! $name ) {
+                    continue;
+                }
+
+                $attributes[$name] = $value;
+            }
+        }
+
+        return new self( $attributes );
+    }
+
+    /**
      * @param array<string, null|array<array-key, string>|bool|string>|self $attributes
      *
      * @return self
@@ -241,13 +297,15 @@ final class Attributes implements Stringable
                 continue;
             }
 
-            if ( $value ) {
-                $attributes[$attribute] = "{$attribute}=\"{$value}\"";
-            }
-            else {
+            if ( $value === $attribute ) {
                 $attributes[$attribute] = $attribute;
             }
+            else {
+                $attributes[$attribute] = "{$attribute}=\"{$value}\"";
+            }
         }
+
+        dump( $attributes );
 
         return $attributes;
     }
