@@ -320,10 +320,15 @@ final class Attributes implements Stringable
             $name = $this->name( $name );
 
             if ( $name === 'id' ) {
+                if ( ! $value ) {
+                    continue;
+                }
+
                 \assert(
                     \is_string( $value ),
                     "Attribute '{$name}' can only be string. ".\gettype( $value ).' provided.',
                 );
+
                 $this->attributes[$name] = slug( $value );
 
                 continue;
