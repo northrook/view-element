@@ -305,8 +305,6 @@ final class Attributes implements Stringable
             }
         }
 
-        dump( $attributes );
-
         return $attributes;
     }
 
