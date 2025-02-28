@@ -13,15 +13,11 @@ final class Content implements Stringable
     private array $content;
 
     /**
-     * @param null|array<string, null|string|Stringable>|string|Stringable $content
+     * @param null|string|Stringable ...$content
      */
-    public function __construct( null|string|array|Stringable $content )
+    public function __construct( null|string|Stringable ...$content )
     {
-        $this->content = match ( true ) {
-            $content === null       => [],
-            ! \is_array( $content ) => [$content],
-            default                 => $content,
-        };
+        $this->content = $content;
     }
 
     public function __toString() : string
@@ -29,23 +25,25 @@ final class Content implements Stringable
         return \implode( PHP_EOL, $this->content );
     }
 
-    public function set( string $key, string|Stringable $value ) : void
+    public function set( string $key, string|Stringable|null $value ) : void
     {
         $this->content[$key] = $value;
     }
 
     public function prepend( null|string|Stringable ...$content ) : void
     {
-        foreach ( $content as $item ) {
-            \array_unshift( $this->content, (string) $item );
-        }
+        $this->content = [
+            ...\array_map( fn( $item ) => (string) $item, $content ),
+            ...$this->content,
+        ];
     }
 
     public function append( null|string|Stringable ...$content ) : void
     {
-        foreach ( $content as $item ) {
-            $this->content[] = (string) $item;
-        }
+        $this->content = [
+            ...$this->content,
+            ...\array_map( fn( $item ) => (string) $item, $content ),
+        ];
     }
 
     public function getString( string $separator = '' ) : string

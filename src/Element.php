@@ -22,17 +22,17 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                                    $tag
-     * @param null|array<string, null|string|Stringable>|string|Stringable  $content
-     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
+     * @param string|Tag                                                               $tag
+     * @param null|array<string, null|string|Stringable>|string|Stringable             $content
+     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
      */
     public function __construct(
-        string|Tag                                   $tag = 'div',
-        null|string|array|Stringable                 $content = null,
-        array|null|bool|float|int|string|UnitEnum ...$attributes,
+        string|Tag                                              $tag = 'div',
+        null|string|array|Stringable                            $content = null,
+        Attributes|array|null|bool|float|int|string|UnitEnum ...$attributes,
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $this->content    = new Content( $content );
+        $this->content    = new Content( ...( \is_array( $content ) ? $content : [$content] ?? [] ) );
         $this->attributes = new Attributes( ...$attributes );
     }
 

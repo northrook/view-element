@@ -25,10 +25,13 @@ final class Attributes implements Stringable
     ];
 
     /**
-     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
+     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
      */
-    public function __construct( array|bool|string|int|float|UnitEnum|null ...$attributes )
+    public function __construct( Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes )
     {
+        if ( $attributes[0] instanceof Attributes ) {
+            $attributes = $this->assign( $attributes[0] );
+        }
         $this->assign( $attributes );
     }
 
@@ -107,21 +110,19 @@ final class Attributes implements Stringable
             }
         }
 
-        return new self( $attributes );
+        return new self( ...$attributes );
     }
 
     /**
-     * @param ?Attributes                                                   $self
-     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
+     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
      *
      * @return self
      */
     public static function from(
-        ?Attributes                                  $self = null,
-        array|bool|string|int|float|UnitEnum|null ...$attributes,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : self {
-        if ( $self ) {
-            return $self;
+        if ( $attributes[0] instanceof Attributes ) {
+            return $attributes[0];
         }
 
         return new self( ...$attributes );
@@ -130,11 +131,11 @@ final class Attributes implements Stringable
     /**
      * Assign one or more attributes, clearing any existing attributes.
      *
-     * @param array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum> $attributes
+     * @param array<int|string, null|array<null|string>|Attributes|bool|float|int|string|UnitEnum>|Attributes $attributes
      *
      * @return $this
      */
-    public function assign( array $attributes ) : self
+    public function assign( Attributes|array $attributes ) : self
     {
         $this->setAttributes( $attributes, true );
         return $this;
@@ -245,8 +246,9 @@ final class Attributes implements Stringable
      */
     public function merge( Attributes|array $attributes ) : self
     {
-        $attributes = $attributes instanceof Attributes ? $attributes->attributes : $attributes;
-        return $this->assign( $attributes );
+        return $this->assign(
+            $attributes instanceof Attributes ? $attributes->attributes : $attributes,
+        );
     }
 
     /**
@@ -317,12 +319,21 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum> $attributes
-     * @param bool                                                                      $override
+     * @param array<int|string, null|array<null|string>|Attributes|bool|float|int|string|UnitEnum>|Attributes $attributes
+     * @param bool                                                                                            $override
      */
-    private function setAttributes( array $attributes, bool $override = false ) : void
+    private function setAttributes( Attributes|array $attributes, bool $override = false ) : void
     {
+        if ( $attributes instanceof Attributes ) {
+            $this->attributes = $attributes->attributes;
+            return;
+        }
+
         foreach ( $attributes as $name => $value ) {
+            if ( $value instanceof Attributes ) {
+                $this->setAttributes( $value->attributes, $override );
+            }
+
             $name = $this->name( $name );
 
             if ( $name === 'id' ) {
