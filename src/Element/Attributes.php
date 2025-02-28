@@ -28,9 +28,10 @@ final class Attributes implements Stringable
      */
     public function __construct( Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes )
     {
-        if ( $attributes[0] instanceof Attributes ) {
+        if ( $attributes[0] ?? null instanceof Attributes ) {
             $attributes = $this->assign( $attributes[0] );
         }
+
         $this->assign( $attributes );
     }
 
@@ -120,7 +121,7 @@ final class Attributes implements Stringable
     public static function from(
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : self {
-        if ( $attributes[0] instanceof Attributes ) {
+        if ( $attributes[0] ?? null instanceof Attributes ) {
             return $attributes[0];
         }
 
