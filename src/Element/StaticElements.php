@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use Core\View\Element;
-use Support\Escape;
 use InvalidArgumentException;
+use function Support\escape_url;
 
 trait StaticElements
 {
@@ -20,7 +20,7 @@ trait StaticElements
         string                    $href,
         string|bool|array|null ...$attributes,
     ) : string {
-        $attributes['href'] = Escape::url( $href );
+        $attributes['href'] = escape_url( $href );
         return Tag::from( 'link' )->getOpeningTag( $attributes );
     }
 
@@ -37,13 +37,13 @@ trait StaticElements
         string|bool|array|null ...$attributes,
     ) : string {
         if ( $src && ! $inline ) {
-            $attributes['src'] = Escape::url( $src );
+            $attributes['src'] = escape_url( $src );
         }
         else {
             unset( $attributes['src'] );
         }
 
-        return (string) new Element( 'script', $attributes, $inline );
+        return (string) new Element( 'script', $inline, ...$attributes );
     }
 
     /**
@@ -59,14 +59,14 @@ trait StaticElements
         string|bool|array|null ...$attributes,
     ) : string {
         if ( $href && ! $inline ) {
-            $attributes['href'] = Escape::url( $href );
+            $attributes['href'] = escape_url( $href );
             $attributes['rel']  = 'stylesheet';
             return Tag::from( 'link' )->getOpeningTag( $attributes );
         }
 
         if ( $inline ) {
             unset( $attributes['href'] );
-            return (string) new Element( 'style', $attributes, $inline );
+            return (string) new Element( 'style', $inline, ...$attributes );
         }
 
         throw new InvalidArgumentException();

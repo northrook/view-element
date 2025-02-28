@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use Core\View\Element\Attributes\{ClassAttribute, StyleAttribute};
-use Stringable, InvalidArgumentException, LogicException;
+use Stringable, UnitEnum, InvalidArgumentException, LogicException;
 use function Support\slug;
-use UnitEnum;
 
 /**
  * @property-read ClassAttribute                                                                          $class

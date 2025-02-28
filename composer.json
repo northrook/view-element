@@ -17,11 +17,13 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=8.3"
+    "php": ">=8.3",
+    "ext-ctype": "*",
+    "ext-mbstring": "*",
+    "northrook/core": "*"
   },
   "require-dev": {
     "northrook/dev": "dev-main",
-    "northrook/support": "dev-main",
     "latte/latte": "^3.0"
   },
   "scripts": {

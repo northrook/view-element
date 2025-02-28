@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Core\View\Element;
 
-use Stringable;
-use BadMethodCallException;
-use UnitEnum;
+use Stringable, UnitEnum, BadMethodCallException;
+use const Support\{TAG_HEADING, TAG_INLINE, TAG_SELF_CLOSING};
 
-/**
- */
 final class Tag implements Stringable
 {
     public const array TAGS = [
@@ -59,42 +56,12 @@ final class Tag implements Stringable
         'h6',
     ];
 
-    public const array HEADING = ['hgroup', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+    public const array HEADING = TAG_HEADING;
 
     /** @link https://developer.mozilla.org/en-US/docs/Web/HTML/Content_categories#flow_content MDN */
-    public const array INLINE = [
-        'a',
-        'b',
-        'strong',
-        'cite',
-        'code',
-        'em',
-        'i',
-        'kbd',
-        'mark',
-        'span',
-        's',
-        'small',
-        'wbr',
-    ];
+    public const array INLINE = TAG_INLINE;
 
-    public const array SELF_CLOSING = [
-        'meta',
-        'link',
-        'img',
-        'input',
-        'wbr',
-        'hr',
-        'br',
-        'col',
-        'area',
-        'base',
-        'source',
-        'param',
-        'embed',
-        'track',
-        'keygen',
-    ];
+    public const array SELF_CLOSING = TAG_SELF_CLOSING;
 
     private function __construct( private string $name ) {}
 
