@@ -46,7 +46,7 @@ final class StyleAttribute
     }
 
     /**
-     * @param null|array<array-key,string>|string $style
+     * @param null|array<array-key,?string>|string $style
      * @param bool                                $prepend
      * @param bool                                $append
      *

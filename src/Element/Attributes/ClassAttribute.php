@@ -43,9 +43,9 @@ final class ClassAttribute
     }
 
     /**
-     * @param null|string|string[] $class
-     * @param bool                 $prepend
-     * @param bool                 $append
+     * @param null|array<int, ?string>|string $class
+     * @param bool                            $prepend
+     * @param bool                            $append
      *
      * @return Attributes
      */

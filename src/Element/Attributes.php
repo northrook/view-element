@@ -7,6 +7,7 @@ namespace Core\View\Element;
 use Core\View\Element\Attributes\{ClassAttribute, StyleAttribute};
 use Stringable, InvalidArgumentException, LogicException;
 use function Support\slug;
+use UnitEnum;
 
 /**
  * @property-read ClassAttribute                                                                          $class
@@ -24,9 +25,9 @@ final class Attributes implements Stringable
     ];
 
     /**
-     * @param array<string, null|array<array-key, string>|bool|int|string> $attributes
+     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
      */
-    public function __construct( array $attributes = [] )
+    public function __construct( array|bool|string|int|float|UnitEnum|null ...$attributes )
     {
         $this->assign( $attributes );
     }
@@ -110,19 +111,26 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param array<string, null|array<array-key, string>|bool|string>|self $attributes
+     * @param ?Attributes                                                   $self
+     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
      *
      * @return self
      */
-    public static function from( array|self $attributes ) : self
-    {
-        return $attributes instanceof Attributes ? $attributes : new Attributes( $attributes );
+    public static function from(
+        ?Attributes                                  $self = null,
+        array|bool|string|int|float|UnitEnum|null ...$attributes,
+    ) : self {
+        if ( $self ) {
+            return $self;
+        }
+
+        return new self( ...$attributes );
     }
 
     /**
      * Assign one or more attributes, clearing any existing attributes.
      *
-     * @param array<string, null|array<array-key, string>|bool|int|string> $attributes
+     * @param array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum> $attributes
      *
      * @return $this
      */
@@ -309,8 +317,8 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param array<string, null|array<array-key, string>|bool|int|string> $attributes
-     * @param bool                                                         $override
+     * @param array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum> $attributes
+     * @param bool                                                                      $override
      */
     private function setAttributes( array $attributes, bool $override = false ) : void
     {

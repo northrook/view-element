@@ -12,9 +12,16 @@ final class Content implements Stringable
     /** @var array<array-key, null|string|Stringable> */
     private array $content;
 
-    public function __construct( null|string|Stringable ...$content )
+    /**
+     * @param null|array<string, null|string|Stringable>|string|Stringable $content
+     */
+    public function __construct( null|string|array|Stringable $content )
     {
-        $this->content = $content;
+        $this->content = match ( true ) {
+            $content === null       => [],
+            ! \is_array( $content ) => [$content],
+            default                 => $content,
+        };
     }
 
     public function __toString() : string

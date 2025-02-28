@@ -7,6 +7,7 @@ namespace Core\View;
 use Core\View\Element\{Attributes, Content, StaticElements, Tag};
 use Core\Interface\View;
 use Stringable;
+use UnitEnum;
 
 class Element extends View
 {
@@ -21,18 +22,18 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                                             $tag
-     * @param array<array-key, null|array<array-key, string>|bool|string>|Attributes $attributes
-     * @param null|string|Stringable                                                 ...$content
+     * @param string|Tag                                                    $tag
+     * @param null|array<string, null|string|Stringable>|string|Stringable  $content
+     * @param null|array<array-key, ?string>|bool|float|int|string|UnitEnum ...$attributes
      */
     public function __construct(
-        string|Tag                $tag = 'div',
-        array|Attributes          $attributes = [],
-        null|string|Stringable ...$content,
+        string|Tag                                   $tag = 'div',
+        null|string|array|Stringable                 $content = null,
+        array|null|bool|float|int|string|UnitEnum ...$attributes,
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $this->attributes = $attributes instanceof Attributes ? $attributes : new Attributes( $attributes );
-        $this->content    = new Content( ...$content );
+        $this->content    = new Content( $content );
+        $this->attributes = new Attributes( ...$attributes );
     }
 
     protected function build( string $separator = '' ) : string

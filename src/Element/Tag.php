@@ -6,6 +6,7 @@ namespace Core\View\Element;
 
 use Stringable;
 use BadMethodCallException;
+use UnitEnum;
 
 /**
  */
@@ -171,14 +172,14 @@ final class Tag implements Stringable
     }
 
     /**
-     * @param null|array<array-key, null|array<array-key, string>|bool|string>|Attributes $attributes
+     * @param null|array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum>|Attributes $attributes
      *
      * @return string
      */
     public function getOpeningTag( null|array|Attributes $attributes = null ) : string
     {
         if ( \is_array( $attributes ) ) {
-            $attributes = new Attributes( $attributes );
+            $attributes = new Attributes( ...$attributes );
         }
 
         return "<{$this->name}{$attributes}>";
