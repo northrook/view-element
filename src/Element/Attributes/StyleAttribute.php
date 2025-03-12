@@ -46,6 +46,47 @@ final class StyleAttribute
     }
 
     /**
+     * @param array<array-key,?string>|string $style
+     * @param array<string, string>           $styles [optional] merge `$styles` into this array
+     *
+     * @return array<string, string>
+     */
+    public static function toArray( string|array $style, array $styles = [] ) : array
+    {
+        $style = \is_string( $style ) ? \preg_split(
+            pattern : '#;\s*(?![^(]*\))#',
+            subject : \trim( $style ),
+            flags   : PREG_SPLIT_NO_EMPTY,
+        ) ?: [$style] : $style;
+
+        foreach ( $style as $name => $value ) {
+            //
+            // Normalize, and skip if empty
+            if ( ! $value = \trim( (string) $value, " \n\r\t\v\0," ) ) {
+                continue;
+            }
+            //
+            // Parse inlined name:value
+            if ( \is_numeric( $name ) && \str_contains( $value, ':' ) ) {
+                [$name, $value] = \explode( ':', $value, 2 );
+            }
+            //
+            // Normalize
+            $name  = \trim( $name, " \n\r\t\v\0,:" );
+            $value = \trim( $value, " \n\r\t\v\0,;" );
+            //
+            // Validate
+            if ( \ctype_digit( $name[0] ) ) {
+                throw new ValueError( 'CSS style names cannot start with a number.' );
+            }
+
+            $styles[$name] = $value;
+        }
+
+        return \array_filter( $styles );
+    }
+
+    /**
      * @param null|array<array-key,?string>|string $style
      * @param bool                                 $prepend
      * @param bool                                 $append
@@ -58,42 +99,8 @@ final class StyleAttribute
             return $this->return;
         }
 
-        if ( \is_string( $style ) ) {
-            $style = \trim( $style );
-            $style = match ( true ) {
-                \str_contains( $style, ';' ) => \explode( ';', $style ),
-                // \str_contains( $style, ':' ) => [$style],
-                default => [$style],
-            };
-        }
-
-        $style = \array_filter( $style );
-
-        // !testing
-        // $this->style = \array_merge( $this->style, $style );
-        // return $this->return;
-
         // Cast and filter to array of values
-        foreach ( $style as $name => $value ) {
-            //
-            // Normalize, and skip if empty
-            if ( ! $value = \trim( $value, " \n\r\t\v\0," ) ) {
-                continue;
-            }
-
-            // Parse inlined name:value
-            if ( \is_numeric( $name ) && \str_contains( $value, ':' ) ) {
-                [$name, $value] = \explode( ':', $value, 2 );
-            }
-
-            // Normalize
-            $name  = \trim( $name, " \n\r\t\v\0,:" );
-            $value = \trim( $value, " \n\r\t\v\0,;" );
-
-            if ( \ctype_digit( $name[0] ) ) {
-                throw new ValueError( 'CSS style names cannot start with a number.' );
-            }
-
+        foreach ( $this::toArray( $style ) as $name => $value ) {
             // Append by default
             if ( ! $prepend && ! $append ) {
                 $this->style[$name] = $value;

@@ -71,4 +71,56 @@ trait StaticElements
 
         throw new InvalidArgumentException();
     }
+
+    public static function img(
+        string                    $src,
+        string                    $alt = '',
+        null|string|array         $srcset = null,
+        null|string|array         $sizes = null,
+        string|bool|array|null ...$attributes,
+    ) : string {
+        $attributes['src'] = escape_url( $src );
+        $attributes['alt'] = $alt;
+
+        if ( $srcset ) {
+            $attributes['srcset'] = \is_array( $srcset ) ? \implode( ', ', $srcset ) : $srcset;
+        }
+
+        if ( $sizes ) {
+            $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
+        }
+
+        return Tag::from( 'img' )->getOpeningTag( $attributes );
+    }
+
+    public static function source(
+        ?string                   $src = null,
+        ?string                   $srcset = null,
+        ?string                   $media = null,
+        ?string                   $type = null,
+        null|string|array         $sizes = null,
+        null|string|array|bool ...$attributes,
+    ) : string {
+        if ( $media ) {
+            $attributes['media'] = $type;
+        }
+
+        if ( $src ) {
+            $attributes['src'] = escape_url( $src );
+        }
+
+        if ( $srcset ) {
+            $attributes['srcset'] = escape_url( $srcset );
+        }
+
+        if ( $type ) {
+            $attributes['type'] = $type;
+        }
+
+        if ( $sizes ) {
+            $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
+        }
+
+        return Tag::from( 'source' )->getOpeningTag( $attributes );
+    }
 }
