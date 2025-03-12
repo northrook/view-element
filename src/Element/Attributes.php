@@ -212,7 +212,7 @@ final class Attributes implements Stringable
         // Convert types to string
         return match ( \gettype( $value ) ) {
             'boolean' => $value ? 'true' : 'false',
-            'string'  => $value ?: null,
+            'string'  => $value,
             default   => null,
         };
     }

@@ -102,7 +102,7 @@ trait StaticElements
         null|string|array|bool ...$attributes,
     ) : string {
         if ( $media ) {
-            $attributes['media'] = $type;
+            $attributes['media'] = $media;
         }
 
         if ( $src ) {
