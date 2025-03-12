@@ -21,9 +21,9 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                                               $tag
-     * @param null|array<string, null|string|Stringable>|string|Stringable             $content
-     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
+     * @param string|Tag                                                   $tag
+     * @param null|array<string, null|string|Stringable>|string|Stringable $content
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum    ...$attributes
      */
     public function __construct(
         string|Tag                                              $tag = 'div',

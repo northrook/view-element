@@ -139,7 +139,7 @@ final class Tag implements Stringable
     }
 
     /**
-     * @param null|array<int|string, null|array<null|string>|bool|float|int|string|UnitEnum>|Attributes $attributes
+     * @param null|array<int|string, null|array<array-key, ?string>|Attributes|scalar|UnitEnum>|Attributes $attributes
      *
      * @return string
      */

@@ -24,11 +24,11 @@ final class Attributes implements Stringable
     ];
 
     /**
-     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      */
     public function __construct( Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes )
     {
-        if ( $attributes[0] ?? null instanceof Attributes ) {
+        if ( isset( $attributes[0] ) && $attributes[0] instanceof Attributes ) {
             $attributes = $this->assign( $attributes[0] );
         }
 
@@ -114,14 +114,14 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param null|array<array-key, ?string>|Attributes|bool|float|int|string|UnitEnum ...$attributes
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
      * @return self
      */
     public static function from(
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : self {
-        if ( $attributes[0] ?? null instanceof Attributes ) {
+        if ( isset( $attributes[0] ) && $attributes[0] instanceof Attributes ) {
             return $attributes[0];
         }
 
@@ -131,7 +131,7 @@ final class Attributes implements Stringable
     /**
      * Assign one or more attributes, clearing any existing attributes.
      *
-     * @param array<int|string, null|array<null|string>|Attributes|bool|float|int|string|UnitEnum>|Attributes $attributes
+     * @param array<int|string, null|array<array-key, ?string>|Attributes|scalar|UnitEnum>|Attributes $attributes
      *
      * @return $this
      */
@@ -240,7 +240,7 @@ final class Attributes implements Stringable
     /**
      * Merges one or more attributes.
      *
-     * @param array<string, null|array<array-key, string>|bool|int|string>|Attributes $attributes
+     * @param array<string, null|array<array-key, string>|scalar>|Attributes $attributes
      *
      * @return $this
      */
@@ -319,8 +319,8 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param array<int|string, null|array<null|string>|Attributes|bool|float|int|string|UnitEnum>|Attributes $attributes
-     * @param bool                                                                                            $override
+     * @param array<int|string, null|array<null|string>|Attributes|scalar|UnitEnum>|Attributes $attributes
+     * @param bool                                                                             $override
      */
     private function setAttributes( Attributes|array $attributes, bool $override = false ) : void
     {

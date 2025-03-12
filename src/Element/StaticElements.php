@@ -6,35 +6,36 @@ namespace Core\View\Element;
 
 use Core\View\Element;
 use InvalidArgumentException;
+use UnitEnum;
 use function Support\escape_url;
 
 trait StaticElements
 {
     /**
-     * @param string                                    $href
-     * @param null|array<array-key, string>|bool|string ...$attributes
+     * @param string                                                    $href
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
      * @return string
      */
     public static function link(
-        string                    $href,
-        string|bool|array|null ...$attributes,
+        string                                                  $href,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : string {
         $attributes['href'] = escape_url( $href );
         return Tag::from( 'link' )->getOpeningTag( $attributes );
     }
 
     /**
-     * @param ?string                                   $src
-     * @param ?string                                   $inline
-     * @param null|array<array-key, string>|bool|string ...$attributes
+     * @param ?string                                                   $src
+     * @param ?string                                                   $inline
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
      * @return string
      */
     public static function script(
-        ?string                   $src = null,
-        ?string                   $inline = null,
-        string|bool|array|null ...$attributes,
+        ?string                                                 $src = null,
+        ?string                                                 $inline = null,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : string {
         if ( $src && ! $inline ) {
             $attributes['src'] = escape_url( $src );
@@ -47,16 +48,16 @@ trait StaticElements
     }
 
     /**
-     * @param ?string                                   $href
-     * @param ?string                                   $inline
-     * @param null|array<array-key, string>|bool|string ...$attributes
+     * @param ?string                                                   $href
+     * @param ?string                                                   $inline
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
      * @return string
      */
     public static function style(
-        ?string                   $href = null,
-        ?string                   $inline = null,
-        string|bool|array|null ...$attributes,
+        ?string                                                 $href = null,
+        ?string                                                 $inline = null,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : string {
         if ( $href && ! $inline ) {
             $attributes['href'] = escape_url( $href );
@@ -72,12 +73,21 @@ trait StaticElements
         throw new InvalidArgumentException();
     }
 
+    /**
+     * @param string                                                    $src
+     * @param string                                                    $alt
+     * @param null|string|string[]                                      $srcset
+     * @param null|string|string[]                                      $sizes
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     *
+     * @return string
+     */
     public static function img(
-        string                    $src,
-        string                    $alt = '',
-        null|string|array         $srcset = null,
-        null|string|array         $sizes = null,
-        string|bool|array|null ...$attributes,
+        string                                                  $src,
+        string                                                  $alt = '',
+        null|string|array                                       $srcset = null,
+        null|string|array                                       $sizes = null,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : string {
         $attributes['src'] = escape_url( $src );
         $attributes['alt'] = $alt;
@@ -93,13 +103,23 @@ trait StaticElements
         return Tag::from( 'img' )->getOpeningTag( $attributes );
     }
 
+    /**
+     * @param null|string                                               $src
+     * @param null|string                                               $srcset
+     * @param null|string                                               $media
+     * @param null|string                                               $type
+     * @param null|string|string[]                                      $sizes
+     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     *
+     * @return string
+     */
     public static function source(
-        ?string                   $src = null,
-        ?string                   $srcset = null,
-        ?string                   $media = null,
-        ?string                   $type = null,
-        null|string|array         $sizes = null,
-        null|string|array|bool ...$attributes,
+        ?string                                                 $src = null,
+        ?string                                                 $srcset = null,
+        ?string                                                 $media = null,
+        ?string                                                 $type = null,
+        null|string|array                                       $sizes = null,
+        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : string {
         if ( $media ) {
             $attributes['media'] = $media;
