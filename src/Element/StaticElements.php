@@ -15,14 +15,14 @@ trait StaticElements
      * @param string                                                    $href
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
-     * @return string
+     * @return Element
      */
     public static function link(
         string                                                  $href,
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
-    ) : string {
+    ) : Element {
         $attributes['href'] = escape_url( $href );
-        return Tag::from( 'link' )->getOpeningTag( $attributes );
+        return new Element( 'link', null, ...$attributes );
     }
 
     /**
@@ -30,13 +30,13 @@ trait StaticElements
      * @param ?string                                                   $inline
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
-     * @return string
+     * @return Element
      */
     public static function script(
         ?string                                                 $src = null,
         ?string                                                 $inline = null,
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
-    ) : string {
+    ) : Element {
         if ( $src && ! $inline ) {
             $attributes['src'] = escape_url( $src );
         }
@@ -44,7 +44,7 @@ trait StaticElements
             unset( $attributes['src'] );
         }
 
-        return (string) new Element( 'script', $inline, ...$attributes );
+        return new Element( 'script', $inline, ...$attributes );
     }
 
     /**
@@ -52,22 +52,22 @@ trait StaticElements
      * @param ?string                                                   $inline
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
-     * @return string
+     * @return Element
      */
     public static function style(
         ?string                                                 $href = null,
         ?string                                                 $inline = null,
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
-    ) : string {
+    ) : Element {
         if ( $href && ! $inline ) {
             $attributes['href'] = escape_url( $href );
             $attributes['rel']  = 'stylesheet';
-            return Tag::from( 'link' )->getOpeningTag( $attributes );
+            return new Element( 'link', null, ...$attributes );
         }
 
         if ( $inline ) {
             unset( $attributes['href'] );
-            return (string) new Element( 'style', $inline, ...$attributes );
+            return new Element( 'style', $inline, ...$attributes );
         }
 
         throw new InvalidArgumentException();
@@ -80,7 +80,7 @@ trait StaticElements
      * @param null|string|string[]                                      $sizes
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
-     * @return string
+     * @return Element
      */
     public static function img(
         string                                                  $src,
@@ -88,7 +88,7 @@ trait StaticElements
         null|string|array                                       $srcset = null,
         null|string|array                                       $sizes = null,
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
-    ) : string {
+    ) : Element {
         $attributes['src'] = escape_url( $src );
         $attributes['alt'] = $alt;
 
@@ -100,7 +100,7 @@ trait StaticElements
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
 
-        return Tag::from( 'img' )->getOpeningTag( $attributes );
+        return new Element( 'img', null, ...$attributes );
     }
 
     /**
@@ -111,7 +111,7 @@ trait StaticElements
      * @param null|string|string[]                                      $sizes
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
      *
-     * @return string
+     * @return Element
      */
     public static function source(
         ?string                                                 $src = null,
@@ -120,7 +120,7 @@ trait StaticElements
         ?string                                                 $type = null,
         null|string|array                                       $sizes = null,
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
-    ) : string {
+    ) : Element {
         if ( $media ) {
             $attributes['media'] = $media;
         }
@@ -140,7 +140,6 @@ trait StaticElements
         if ( $sizes ) {
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
-
-        return Tag::from( 'source' )->getOpeningTag( $attributes );
+        return new Element( 'source', null, ...$attributes );
     }
 }
