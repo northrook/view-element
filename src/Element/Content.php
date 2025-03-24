@@ -10,14 +10,37 @@ use function Support\normalizeWhitespace;
 final class Content implements Stringable
 {
     /** @var array<array-key, null|string|Stringable> */
-    private array $content;
+    private array $content = [];
 
     /**
-     * @param null|string|Stringable ...$content
+     * @param null|array<array-key, null|string|Stringable>|string|Stringable ...$content
      */
-    public function __construct( null|string|Stringable ...$content )
+    public function __construct( null|string|array|Stringable ...$content )
     {
-        $this->content = $content;
+        $this->addContent( $content );
+    }
+
+    /**
+     * @param null|array<array-key, null|string|Stringable>|array<array-key,null|array<array-key, null|string|Stringable>|string|Stringable>|string|Stringable $content
+     * @param null|int|string                                                                                                                                  $key
+     *
+     * @return void
+     */
+    public function addContent( null|string|array|Stringable $content, null|int|string $key = null ) : void
+    {
+        if ( \is_array( $content ) ) {
+            foreach ( $content as $key => $value ) {
+                $this->addContent( $value, $key );
+            }
+            return;
+        }
+
+        if ( $key ) {
+            $this->content[$key] = $content;
+        }
+        else {
+            $this->content[] = $content;
+        }
     }
 
     public function __toString() : string
