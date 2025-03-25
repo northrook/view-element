@@ -15,7 +15,6 @@ use function Support\slug;
  */
 final class Attributes implements Stringable
 {
-    // /** @var array{id: ?string, class: string[], style: array<string, string>, ...} */
     /** @var array<string, null|array<array-key, string>|bool|string> */
     private array $attributes = [
         'id'    => null,

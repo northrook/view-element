@@ -9,7 +9,13 @@ use InvalidArgumentException;
 use Stringable, UnitEnum, BadMethodCallException;
 use Support\PropertyAccessor;
 use function Support\{is_stringable};
-use const Support\{TAG_CONTENT, TAG_HEADING, TAG_INLINE, TAG_SELF_CLOSING, TAG_STRUCTURE};
+use const Support\{
+    TAG_CONTENT,
+    TAG_HEADING,
+    TAG_INLINE,
+    TAG_SELF_CLOSING,
+    TAG_STRUCTURE,
+};
 
 /**
  * @property-read  string $name
