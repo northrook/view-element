@@ -161,8 +161,8 @@ final class Tag implements Stringable
     {
         $tag = \strtolower( $tag );
 
-        if ( empty( $tag ) || ! \ctype_alpha( $this->tag ) ) {
-            $message = "Invalid '\$tag' string provided: '{$this->tag}'. Only ASCII letters allowed.";
+        if ( empty( $tag ) || ! \ctype_alnum( $tag ) ) {
+            $message = "Invalid '\$tag' string provided: '{$tag}'. Only ASCII letters allowed.";
             throw new InvalidArgumentException( $message );
         }
 
