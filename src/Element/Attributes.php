@@ -434,13 +434,17 @@ final class Attributes implements Stringable
 
     private function handleClasses() : ClassAttribute
     {
-        \assert( \is_array( $this->attributes['class'] ) );
+        if ( ! isset( $this->attributes['class'] ) ) {
+            $this->attributes['class'] = [];
+        }
         return ClassAttribute::byReference( $this->attributes['class'], $this );
     }
 
     private function handleStyles() : StyleAttribute
     {
-        \assert( \is_array( $this->attributes['style'] ) );
+        if ( ! isset( $this->attributes['style'] ) ) {
+            $this->attributes['style'] = [];
+        }
         return StyleAttribute::byReference( $this->attributes['style'], $this );
     }
 }
