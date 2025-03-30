@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace Core\View;
 
-use Core\View\Element\{Attributes, Content, StaticElements, Tag};
+use Core\View\Element\{
+    Attributes,
+    Content,
+    StaticElements,
+    Tag,
+};
 use Core\Interface\View;
 use Stringable, UnitEnum;
 

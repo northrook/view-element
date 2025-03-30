@@ -16,11 +16,7 @@ use function Support\slug;
 final class Attributes implements Stringable
 {
     /** @var array<string, null|array<array-key, string>|bool|string> */
-    private array $attributes = [
-        'id'    => null,
-        'class' => [],
-        'style' => [],
-    ];
+    private array $attributes = [];
 
     /**
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
