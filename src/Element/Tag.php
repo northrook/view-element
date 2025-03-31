@@ -161,7 +161,7 @@ final class Tag implements Stringable
     {
         $tag = \strtolower( $tag );
 
-        if ( empty( $tag ) || ! \ctype_alnum( $tag ) ) {
+        if ( empty( $tag ) || ! \ctype_alnum( \str_replace( ['_', '-', ':'], '', $tag ) ) ) {
             $message = "Invalid '\$tag' string provided: '{$tag}'. Only ASCII letters allowed.";
             throw new InvalidArgumentException( $message );
         }
