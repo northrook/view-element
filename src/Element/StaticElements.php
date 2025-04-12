@@ -63,18 +63,17 @@ trait StaticElements
             $attributes['href'] = escape_url( $href );
             $attributes['rel']  = 'stylesheet';
             return new Element(
-                tag     : 'link',
-                content : null,
-                set     : $attributes,
+                tag        : 'link',
+                attributes : $attributes,
             );
         }
 
         if ( $inline ) {
             unset( $attributes['href'] );
             return new Element(
-                tag     : 'style',
-                content : $inline,
-                set     : $attributes,
+                tag        : 'style',
+                content    : $inline,
+                attributes : $attributes,
             );
         }
 
@@ -109,9 +108,8 @@ trait StaticElements
         }
 
         return new Element(
-            tag     : 'img',
-            content : null,
-            set     : $attributes,
+            tag        : 'img',
+            attributes : $attributes,
         );
     }
 
@@ -153,9 +151,8 @@ trait StaticElements
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
         return new Element(
-            tag     : 'source',
-            content : null,
-            set     : $attributes,
+            tag        : 'source',
+            attributes : $attributes,
         );
     }
 }

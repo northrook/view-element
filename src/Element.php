@@ -53,7 +53,7 @@ class Element extends View
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
         $this->content    = new Content( ...(array) $content );
-        $this->attributes = new Attributes();
+        $this->attributes = new Attributes( $attributes );
 
         /** @var array<array-key, null|array<array-key, ?string>|scalar|Stringable|UnitEnum> $set */
         foreach ( $set as $name => $argument ) {
