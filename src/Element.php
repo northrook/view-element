@@ -50,7 +50,7 @@ class Element extends View
                 $this->content->add( $argument );
             }
             else {
-                $this->attributes->add( $name, $argument );
+                $this->attributes->set( $name, $argument );
             }
 
             unset( $set[$name] );
@@ -113,7 +113,7 @@ class Element extends View
         $add        = \get_defined_vars();
         $attributes = [...\array_pop( $add ), ...$add];
         // dd( $attributes );
-        $this->attributes->add( $attributes );
+        $this->attributes->merge( $attributes );
 
         return $this;
     }

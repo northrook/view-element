@@ -1,56 +1,51 @@
 <?php
 
-declare(strict_types=1);
+namespace Core\View\Element;
 
-namespace Core\View\Element\Attributes;
-
-use Core\View\Element\Attributes;
 use ValueError;
+use Stringable;
 
 /**
  * @internal
  */
-final class ClassAttribute
+final class Classes implements Stringable
 {
     /**
-     * @param array<string, string> $class
-     * @param Attributes            $return
+     * @param string[]   $class
+     * @param Attributes $attributes
      */
-    private function __construct(
-        private array &               $class,
-        private readonly Attributes $return,
+    public function __construct(
+        protected array &             $class,
+        private readonly Attributes $attributes,
     ) {}
 
-    /**
-     * @param string[]   $data
-     * @param Attributes $return
-     *
-     * @return self
-     */
-    public static function byReference( mixed &$data, Attributes $return ) : self
+    public function __toString() : string
     {
-        return new self( $data, $return );
+        return $this::resolve( $this->class );
     }
 
     /**
-     * @param string[] $array
+     * @param string $class
      *
-     * @return string
+     * @return bool
      */
-    public static function resolve( array $array ) : string
+    public function has( string $class ) : bool
     {
-        return \implode( ' ', \array_filter( $array ) );
+        return \array_key_exists( $class, $this->class );
     }
 
     /**
-     * @param null|array<int, ?string>|string $class
-     * @param bool                            $prepend
-     * @param bool                            $append
+     * @param null|string|string[] $class
+     * @param bool                 $prepend
+     * @param bool                 $append
      *
      * @return Attributes
      */
-    public function add( null|string|array $class, bool $prepend = false, bool $append = false ) : Attributes
-    {
+    public function add(
+        null|string|array $class,
+        bool              $prepend = false,
+        bool              $append = false,
+    ) : Attributes {
         // Cast and filter to array of values
         foreach ( \array_filter( (array) $class ) as $value ) {
             //
@@ -91,17 +86,7 @@ final class ClassAttribute
             }
         }
 
-        return $this->return;
-    }
-
-    /**
-     * @param string $class
-     *
-     * @return bool
-     */
-    public function has( string $class ) : bool
-    {
-        return \array_key_exists( $class, $this->class );
+        return $this->attributes;
     }
 
     public function get( string $class ) : ?string
@@ -117,18 +102,32 @@ final class ClassAttribute
         return $this->class;
     }
 
-    public function clear() : Attributes
-    {
-        $this->class = [];
-        return $this->return;
-    }
-
     public function remove( string ...$class ) : Attributes
     {
         foreach ( $class as $value ) {
             $value = \strtolower( \trim( $value ) );
             unset( $this->class[$value] );
         }
-        return $this->return;
+        return $this->attributes;
+    }
+
+    public function clear() : Attributes
+    {
+        $this->class = [];
+        return $this->attributes;
+    }
+
+    /**
+     * @param string[] $array
+     *
+     * @return string
+     */
+    public static function resolve( array $array ) : string
+    {
+        $classes = \array_filter( $array );
+
+        \ksort( $classes );
+
+        return \implode( ' ', $classes );
     }
 }
