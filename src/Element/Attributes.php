@@ -1,14 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\View\Element;
 
-use LogicException;
-use Stringable;
-use InvalidArgumentException;
-use UnitEnum;
-use function Support\{slug};
 use AllowDynamicProperties;
+use Stringable;
+use UnitEnum;
 use BackedEnum;
+use InvalidArgumentException;
+use function Support\{as_string, slug};
 
 /**
  * @property-read Classes                                                                                 $class
@@ -29,19 +30,21 @@ final class Attributes implements Stringable
     // /** @var array<string, null|scalar|Stringable|UnitEnum> */
     // private array $attributes = [];
 
-    public function __construct(
-        Attributes|null|bool|float|int|string|Stringable|UnitEnum ...$attributes,
-    ) {
-        foreach ( $attributes as $attribute => $value ) {
-            if ( $value instanceof Attributes ) {
-                $this->merge( $value );
-                unset( $attributes[$attribute] );
-            }
+    /**
+     * @param array<string,null|array<array-key, ?string>|BackedEnum|scalar|Stringable|UnitEnum>|Attributes $attributes
+     */
+    public function __construct( null|array|Attributes $attributes = null )
+    {
+        if ( $attributes ) {
+            $this->merge( $attributes );
         }
-
-        $this->merge( $attributes );
     }
 
+    /**
+     * @param array<string,null|array<array-key, ?string>|BackedEnum|scalar|Stringable|UnitEnum>|Attributes $attributes
+     *
+     * @return $this
+     */
     public function merge( Attributes|array $attributes ) : self
     {
         if ( $attributes instanceof Attributes ) {
@@ -51,6 +54,7 @@ final class Attributes implements Stringable
         foreach ( $attributes as $attribute => $value ) {
             $attribute = $this->name( $attribute );
             if ( $attribute === 'id' ) {
+                /** @var null|BackedEnum|string|Stringable|UnitEnum $value */
                 $this->id( $value );
             }
             elseif ( $attribute === 'classes' ) {
@@ -60,6 +64,7 @@ final class Attributes implements Stringable
             }
             elseif ( $attribute === 'styles' ) {
                 $value = \is_array( $value ) ? $value : [$value];
+                /** @var array<array-key, null|array<string,string>|string> $value */
                 $this->style( ...$value );
             }
             else {
@@ -71,24 +76,26 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param string                                         $attribute
-     * @param null|bool|float|int|string|Stringable|UnitEnum $value
+     * @param string                                                                   $attribute
+     * @param null|array<array-key, ?string>|bool|float|int|string|Stringable|UnitEnum $value
      *
      * @return $this
      */
     public function set(
-        string                                         $attribute,
-        int|float|string|bool|null|UnitEnum|Stringable $value = null,
+        string                                               $attribute,
+        array|int|float|string|bool|null|UnitEnum|Stringable $value = null,
     ) : self {
         $attribute = $this->name( $attribute );
 
         if ( $attribute === 'id' ) {
+            /** @var null|BackedEnum|string|Stringable|UnitEnum $value */
             $this->id( $value );
         }
         elseif ( $attribute === 'classes' ) {
             $this->class( $value );
         }
         elseif ( $attribute === 'styles' ) {
+            /** @var array<array-key, null|array<string,?string>|string> $value */
             $this->style( $value );
         }
         else {
@@ -97,25 +104,46 @@ final class Attributes implements Stringable
         return $this;
     }
 
-    public function id( ?string $set ) : self
+    /**
+     * @param null|BackedEnum|string|Stringable|UnitEnum $set
+     *
+     * @return $this
+     */
+    public function id( null|string|BackedEnum|UnitEnum|Stringable $set ) : self
     {
-        $this->id = slug( $set );
+        $this->id = $set ? ( slug( as_string( $set ) ) ?: null ) : null;
         return $this;
     }
 
-    public function class( ?string ...$add ) : self
+    /**
+     * @param null|bool|float|int|string|Stringable|UnitEnum ...$add
+     *
+     * @return self
+     */
+    public function class( bool|float|int|string|Stringable|UnitEnum|null ...$add ) : self
     {
         return ( new Classes( $this->classes, $this ) )->add( $add );
     }
 
     /**
-     * @param array<string,string>|string ...$add
+     * @param null|string|string[] ...$add
      *
      * @return self
      */
     public function style( null|string|array ...$add ) : self
     {
-        return ( new Styles( $this->styles, $this ) )->add( $add );
+        $styles = [];
+
+        foreach ( $add as $key => $value ) {
+            if ( \is_array( $value ) ) {
+                $styles = [...$styles, ...$value];
+            }
+            else {
+                $styles[$key] = $value;
+            }
+        }
+
+        return ( new Styles( $this->styles, $this ) )->add( $styles );
     }
 
     // public function __set( string $name, mixed $value ) : void
@@ -236,7 +264,7 @@ final class Attributes implements Stringable
     {
         $attributes = [];
 
-        /** @var iterable<string, mixed> $this */
+        /** @var iterable<string, BackedEnum|scalar|Stringable|UnitEnum> $this */
         foreach ( $this as $attribute => $value ) {
             if ( $value instanceof BackedEnum ) {
                 $value = $value->value;
@@ -337,6 +365,6 @@ final class Attributes implements Stringable
             }
         }
 
-        return new self( ...$attributes );
+        return new self( $attributes );
     }
 }

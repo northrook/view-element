@@ -14,6 +14,19 @@ use Core\Interface\View;
 use Stringable, UnitEnum;
 use function Support\is_stringable;
 
+// /**
+//  * @param string|Tag                                                $tag
+//  * @param null|array|string|Stringable                              $content
+//  * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum ...$set
+//  */
+// public function __construct(
+//         string|Tag $tag = 'div',
+//         mixed   ...$set,
+// ) {
+
+/**
+ * @phpstan-type AttributeShape null|array<array-key, ?string>|scalar|Stringable|UnitEnum
+ */
 class Element extends View
 {
     use StaticElements;
@@ -27,20 +40,38 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                                $tag
-     * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum ...$set
+     * @param string|Tag                                                                         $tag
+     * @param null[]|scalar[]|Stringable[]                                                       $content
+     * @param array<string,null|array<array-key, ?string>|scalar|Stringable|UnitEnum>|Attributes $attributes
+     * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum                          ...$set
      */
     public function __construct(
-        string|Tag $tag = 'div',
-        mixed   ...$set,
+        string|Tag                   $tag = 'div',
+        null|array|string|Stringable $content = null,
+        null|array|Attributes        $attributes = null,
+        mixed                     ...$set,
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $this->content    = new Content();
+        $this->content    = new Content( ...(array) $content );
         $this->attributes = new Attributes();
 
         /** @var array<array-key, null|array<array-key, ?string>|scalar|Stringable|UnitEnum> $set */
         foreach ( $set as $name => $argument ) {
-            if ( $argument instanceof Attributes ) {
+            if ( \is_array( $argument ) ) {
+                if ( $name === 'attributes' ) {
+                    $this->attributes->merge( $argument );
+                }
+                elseif ( $name === 'content' ) {
+                    $this->content->set( $argument );
+                }
+                elseif ( $name === 'class' ) {
+                    $this->attributes->class( ...$argument );
+                }
+                elseif ( $name === 'style' ) {
+                    $this->attributes->style( ...$argument );
+                }
+            }
+            elseif ( $argument instanceof Attributes ) {
                 $this->attributes->merge( $argument );
             }
             elseif ( $argument instanceof Content ) {
@@ -112,7 +143,6 @@ class Element extends View
     ) : self {
         $add        = \get_defined_vars();
         $attributes = [...\array_pop( $add ), ...$add];
-        // dd( $attributes );
         $this->attributes->merge( $attributes );
 
         return $this;

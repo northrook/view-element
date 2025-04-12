@@ -2,8 +2,11 @@
 
 namespace Core\View\Element;
 
+use UnitEnum;
 use ValueError;
 use Stringable;
+use BackedEnum;
+use function Support\as_string;
 
 /**
  * @internal
@@ -35,22 +38,22 @@ final class Classes implements Stringable
     }
 
     /**
-     * @param null|string|string[] $class
-     * @param bool                 $prepend
-     * @param bool                 $append
+     * @param BackedEnum[]|bool[]|float[]|int[]|null[]|string[]|Stringable[]|UnitEnum[] $class
+     * @param bool                                                                      $prepend
+     * @param bool                                                                      $append
      *
      * @return Attributes
      */
     public function add(
-        null|string|array $class,
-        bool              $prepend = false,
-        bool              $append = false,
+        mixed $class,
+        bool  $prepend = false,
+        bool  $append = false,
     ) : Attributes {
         // Cast and filter to array of values
         foreach ( \array_filter( (array) $class ) as $value ) {
             //
             // Normalize, and skip if empty
-            if ( ! $selector = \strtolower( \trim( $value ) ) ) {
+            if ( ! $selector = \strtolower( \trim( as_string( $value ) ) ) ) {
                 continue;
             }
 
