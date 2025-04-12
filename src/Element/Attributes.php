@@ -15,8 +15,9 @@ use function Support\slug;
  */
 final class Attributes implements Stringable
 {
-    /** @var array<string, null|array<array-key, string>|bool|string> */
-    private array $attributes = [];
+    // /** @var array<string, null|array<array-key, string>|bool|string> */
+    /** @var array{id: ?string, class: string[], style: array<string, string>, string: bool|string} */
+    private array $attributes;
 
     /**
      * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
@@ -143,14 +144,14 @@ final class Attributes implements Stringable
      * - Boolean `$value` set as `true|false`.
      * - Only `class` and `style` accept `array` values.
      *
-     * @param array<array-key, null|array<array-key, string>|bool|int|string>|string $attribute
-     * @param null|array<array-key, string>|bool|int|string                          $value
+     * @param array<array-key, null|array<array-key, string>|scalar|Stringable|UnitEnum>|string $attribute
+     * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum                         $value
      *
      * @return $this
      */
     public function add(
-        string|array               $attribute,
-        int|string|array|bool|null $value = null,
+        string|array                                         $attribute,
+        int|float|string|array|bool|null|UnitEnum|Stringable $value = null,
     ) : self {
         if ( \is_string( $attribute ) ) {
             $attribute = [$attribute => $value];
@@ -168,14 +169,14 @@ final class Attributes implements Stringable
      * - Boolean `$value` set as `true|false`.
      * - Only `class` and `style` accept `array` values.
      *
-     * @param array<string, null|array<array-key, string>|bool|int|string>|string $attribute
-     * @param null|array<array-key, string>|bool|int|string                       $value
+     * @param array<array-key, null|array<array-key, string>|scalar|Stringable|UnitEnum>|string $attribute
+     * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum                         $value
      *
      * @return $this
      */
     public function set(
-        string|array               $attribute,
-        int|string|array|bool|null $value = null,
+        string|array                                         $attribute,
+        int|float|string|array|bool|null|UnitEnum|Stringable $value = null,
     ) : self {
         if ( \is_string( $attribute ) ) {
             $attribute = [$attribute => $value];
@@ -253,11 +254,7 @@ final class Attributes implements Stringable
      */
     public function clear() : self
     {
-        $this->attributes = [
-            'id'    => null,
-            'class' => [],
-            'style' => [],
-        ];
+        unset( $this->attributes );
         return $this;
     }
 
@@ -314,8 +311,8 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param array<int|string, null|array<null|string>|Attributes|scalar|UnitEnum>|Attributes $attributes
-     * @param bool                                                                             $override
+     * @param array<int|string, null|array<null|string>|Attributes|scalar|Stringable|UnitEnum>|Attributes $attributes
+     * @param bool                                                                                        $override
      */
     private function setAttributes( Attributes|array $attributes, bool $override = false ) : void
     {
@@ -327,6 +324,10 @@ final class Attributes implements Stringable
         foreach ( $attributes as $name => $value ) {
             if ( $value instanceof Attributes ) {
                 $this->setAttributes( $value->attributes, $override );
+            }
+
+            if ( $value instanceof Stringable ) {
+                $value = (string) $value;
             }
 
             $name = $this->name( $name );
@@ -407,7 +408,7 @@ final class Attributes implements Stringable
     private function attributeArray() : array
     {
         $attributes = \array_filter( $this->attributes );
-        if ( isset( $attributes['class'] ) && \is_array( $attributes['class'] ) ) {
+        if ( isset( $attributes['class'] ) ) {
             $attributes['class'] = \array_values( $attributes['class'] );
         }
         return $attributes;
@@ -445,6 +446,7 @@ final class Attributes implements Stringable
         if ( ! isset( $this->attributes['style'] ) ) {
             $this->attributes['style'] = [];
         }
+
         return StyleAttribute::byReference( $this->attributes['style'], $this );
     }
 }

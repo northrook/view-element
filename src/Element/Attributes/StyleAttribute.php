@@ -6,6 +6,7 @@ namespace Core\View\Element\Attributes;
 
 use Core\View\Element\Attributes;
 use ValueError;
+use InvalidArgumentException;
 
 /**
  * @internal
@@ -22,8 +23,8 @@ final class StyleAttribute
     ) {}
 
     /**
-     * @param array<string, string> $data
-     * @param Attributes            $return
+     * @param array<array-key, string> $data
+     * @param Attributes               $return
      *
      * @return self
      */
@@ -69,6 +70,11 @@ final class StyleAttribute
             // Parse inlined name:value
             if ( \is_numeric( $name ) && \str_contains( $value, ':' ) ) {
                 [$name, $value] = \explode( ':', $value, 2 );
+            }
+            else {
+                throw new InvalidArgumentException(
+                    "Unable to parse style '{$value}'.\nStyle: separator appears to be missing.",
+                );
             }
             //
             // Normalize

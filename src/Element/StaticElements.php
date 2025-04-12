@@ -22,7 +22,7 @@ trait StaticElements
         Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
     ) : Element {
         $attributes['href'] = escape_url( $href );
-        return new Element( 'link', null, ...$attributes );
+        return new Element( 'link', ...$attributes );
     }
 
     /**
@@ -44,7 +44,7 @@ trait StaticElements
             unset( $attributes['src'] );
         }
 
-        return new Element( 'script', $inline, ...$attributes );
+        return new Element( 'script', content : $inline, set : $attributes );
     }
 
     /**
@@ -62,12 +62,20 @@ trait StaticElements
         if ( $href && ! $inline ) {
             $attributes['href'] = escape_url( $href );
             $attributes['rel']  = 'stylesheet';
-            return new Element( 'link', null, ...$attributes );
+            return new Element(
+                tag     : 'link',
+                content : null,
+                set     : $attributes,
+            );
         }
 
         if ( $inline ) {
             unset( $attributes['href'] );
-            return new Element( 'style', $inline, ...$attributes );
+            return new Element(
+                tag     : 'style',
+                content : $inline,
+                set     : $attributes,
+            );
         }
 
         throw new InvalidArgumentException();
@@ -100,7 +108,11 @@ trait StaticElements
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
 
-        return new Element( 'img', null, ...$attributes );
+        return new Element(
+            tag     : 'img',
+            content : null,
+            set     : $attributes,
+        );
     }
 
     /**
@@ -140,6 +152,10 @@ trait StaticElements
         if ( $sizes ) {
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
-        return new Element( 'source', null, ...$attributes );
+        return new Element(
+            tag     : 'source',
+            content : null,
+            set     : $attributes,
+        );
     }
 }
