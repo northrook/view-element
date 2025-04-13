@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Core\View\Element;
 
-use UnitEnum;
 use ValueError;
 use Stringable;
-use BackedEnum;
 use function Support\as_string;
 
 /**
@@ -40,9 +38,9 @@ final class Classes implements Stringable
     }
 
     /**
-     * @param BackedEnum[]|bool[]|float[]|int[]|null[]|string[]|Stringable[]|UnitEnum[] $class
-     * @param bool                                                                      $prepend
-     * @param bool                                                                      $append
+     * @param mixed $class
+     * @param bool  $prepend
+     * @param bool  $append
      *
      * @return Attributes
      */

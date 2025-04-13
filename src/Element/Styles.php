@@ -7,6 +7,7 @@ namespace Core\View\Element;
 use Stringable;
 use InvalidArgumentException;
 use ValueError;
+use function Support\as_string;
 
 /**
  * @internal
@@ -45,16 +46,16 @@ final class Styles implements Stringable
     }
 
     /**
-     * @param null|array<array-key,?string>|string $style
-     * @param bool                                 $prepend
-     * @param bool                                 $append
+     * @param mixed $style
+     * @param bool  $prepend
+     * @param bool  $append
      *
      * @return Attributes
      */
     public function add(
-        null|string|array $style,
-        bool              $prepend = false,
-        bool              $append = false,
+        mixed $style,
+        bool  $prepend = false,
+        bool  $append = false,
     ) : Attributes {
         if ( ! $style ) {
             return $this->attributes;
@@ -136,18 +137,20 @@ final class Styles implements Stringable
     }
 
     /**
-     * @param array<array-key,?string>|string $style
-     * @param array<string, string>           $styles [optional] merge `$styles` into this array
+     * @param mixed                 $style
+     * @param array<string, string> $styles [optional] merge `$styles` into this array
      *
      * @return array<string, string>
      */
-    public static function arrayFrom( string|array $style, array $styles = [] ) : array
+    public static function arrayFrom( mixed $style, array $styles = [] ) : array
     {
-        $style = \is_string( $style ) ? \preg_split(
-            pattern : '#;\s*(?![^(]*\))#',
-            subject : \trim( $style ),
-            flags   : PREG_SPLIT_NO_EMPTY,
-        ) ?: [$style] : $style;
+        if ( ! \is_array( $style ) ) {
+            $style = (array) \preg_split(
+                pattern : '#;\s*(?![^(]*\))#',
+                subject : \trim( as_string( $style ) ),
+                flags   : PREG_SPLIT_NO_EMPTY,
+            ) ?: [];
+        }
 
         foreach ( $style as $name => $value ) {
             //
