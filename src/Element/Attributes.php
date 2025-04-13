@@ -13,9 +13,9 @@ use InvalidArgumentException;
 use function Support\{as_array, as_string, slug};
 
 /**
+ * @property-read array{id: ?string, class: string[], style: array<string, string>, ...<string, ?string>} $array
  * @property-read Classes                                                                                 $class
  * @property-read Styles                                                                                  $style
- * @property-read array{id: ?string, class: string[], style: array<string, string>, ...<string, ?string>} $array
  */
 #[AllowDynamicProperties]
 final class Attributes implements Stringable
@@ -27,9 +27,6 @@ final class Attributes implements Stringable
 
     /** @var array<string,string> */
     private array $styles = [];
-
-    // /** @var array<string, null|scalar|Stringable|UnitEnum> */
-    // private array $attributes = [];
 
     /**
      * @param mixed ...$attributes
@@ -47,16 +44,58 @@ final class Attributes implements Stringable
     public function merge( mixed ...$attributes ) : self
     {
         foreach ( $this->parse( $attributes ) as $attribute => $value ) {
-            $this->setAttribute( $attribute, $value );
+            $this->set( $attribute, $value );
         }
 
         return $this;
     }
 
-    private function setAttribute(
-        string $attribute,
-        mixed  $value,
+    /**
+     * @param string $attribute
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    public function has( string $attribute, mixed $value = null ) : bool
+    {
+        // Get attribute by name, or false if unset
+        $attribute = $this->{$this->name( $attribute )} ?? false;
+
+        // Check against value if requested
+        if ( $value ) {
+            return $attribute === $value;
+        }
+
+        // If the attribute is anything but false, consider it set
+        return $attribute !== false;
+    }
+
+    /**
+     * @param mixed ...$attribute
+     *
+     * @return $this
+     */
+    public function add( mixed ...$attribute ) : self
+    {
+        foreach ( $attribute as $key => $value ) {
+            $this->set( $key, $value );
+        }
+        return $this;
+    }
+
+    /**
+     * @param int|string $attribute
+     * @param mixed      $value
+     *
+     * @return void
+     */
+    public function set(
+        int|string $attribute,
+        mixed      $value,
     ) : void {
+        /** @var string $attribute */
+        $attribute = $this->name( $attribute );
+
         if ( $value === null ) {
             dump( [__METHOD__ => "{$attribute} is ".\gettype( $value )] );
             return;
@@ -86,19 +125,6 @@ final class Attributes implements Stringable
         }
 
         $this->{$attribute} = $value;
-    }
-
-    /**
-     * @param mixed ...$attribute
-     *
-     * @return $this
-     */
-    public function set( mixed ...$attribute ) : self
-    {
-        foreach ( $attribute as $key => $value ) {
-            $this->setAttribute( $this->name( $key ), $value );
-        }
-        return $this;
     }
 
     /**
@@ -158,26 +184,6 @@ final class Attributes implements Stringable
                 'Warning: Undefined property: '.$this::class."::\${$name}",
             ),
         };
-    }
-
-    /**
-     * @param string $attribute
-     * @param mixed  $value
-     *
-     * @return bool
-     */
-    public function has( string $attribute, mixed $value = null ) : bool
-    {
-        // Get attribute by name, or false if unset
-        $attribute = $this->{$this->name( $attribute )} ?? false;
-
-        // Check against value if requested
-        if ( $value ) {
-            return $attribute === $value;
-        }
-
-        // If the attribute is anything but false, consider it set
-        return $attribute !== false;
     }
 
     /**
