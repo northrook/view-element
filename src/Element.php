@@ -12,7 +12,7 @@ use Core\View\Element\{
 };
 use Core\Interface\View;
 use Stringable, UnitEnum;
-use function Support\is_stringable;
+use function Support\variadic_argument;
 
 // /**
 //  * @param string|Tag                                                $tag
@@ -40,10 +40,10 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                                                         $tag
-     * @param null[]|scalar[]|Stringable[]                                                       $content
-     * @param array<string,null|array<array-key, ?string>|scalar|Stringable|UnitEnum>|Attributes $attributes
-     * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum                          ...$set
+     * @param string|Tag                     $tag
+     * @param null[]|scalar[]|Stringable[]   $content
+     * @param array<string,mixed>|Attributes $attributes
+     * @param mixed                          ...$set
      */
     public function __construct(
         string|Tag                   $tag = 'div',
@@ -53,39 +53,7 @@ class Element extends View
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
         $this->content    = new Content( ...(array) $content );
-        $this->attributes = new Attributes( $attributes );
-
-        /** @var array<array-key, null|array<array-key, ?string>|scalar|Stringable|UnitEnum> $set */
-        foreach ( $set as $name => $argument ) {
-            if ( \is_array( $argument ) ) {
-                if ( $name === 'attributes' ) {
-                    $this->attributes->merge( $argument );
-                }
-                elseif ( $name === 'content' ) {
-                    $this->content->set( $argument );
-                }
-                elseif ( $name === 'class' ) {
-                    $this->attributes->class( ...$argument );
-                }
-                elseif ( $name === 'style' ) {
-                    $this->attributes->style( ...$argument );
-                }
-            }
-            elseif ( $argument instanceof Attributes ) {
-                $this->attributes->merge( $argument );
-            }
-            elseif ( $argument instanceof Content ) {
-                $this->content->add( ...$argument->getArray() );
-            }
-            elseif ( $name === 'content' && ( is_stringable( $argument ) ) ) {
-                $this->content->add( $argument );
-            }
-            else {
-                $this->attributes->set( $name, $argument );
-            }
-
-            unset( $set[$name] );
-        }
+        $this->attributes = ( new Attributes( $attributes ) )->merge( $set );
     }
 
     protected function build( string $separator = '' ) : string
@@ -131,19 +99,17 @@ class Element extends View
      * @param ?string                                   $id
      * @param ?string                                   $class
      * @param ?string                                   $style
-     * @param null|array<array-key, string>|bool|string ...$add
+     * @param null|array<array-key, string>|bool|string ...$attributes
      *
      * @return $this
      */
     final public function attributes(
-        ?string                   $id = null,
-        ?string                   $class = null,
-        ?string                   $style = null,
-        null|array|bool|string ...$add,
+        ?string  $id = null,
+        ?string  $class = null,
+        ?string  $style = null,
+        mixed ...$attributes,
     ) : self {
-        $add        = \get_defined_vars();
-        $attributes = [...\array_pop( $add ), ...$add];
-        $this->attributes->merge( $attributes );
+        $this->attributes->merge( ...variadic_argument( \get_defined_vars() ) );
 
         return $this;
     }

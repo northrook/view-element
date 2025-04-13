@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Core\View\Element;
 
 use AllowDynamicProperties;
+use Core\Interface\Printable;
 use Stringable;
 use UnitEnum;
 use BackedEnum;
 use InvalidArgumentException;
-use function Support\{as_string, slug};
+use function Support\{as_array, as_string, slug};
 
 /**
  * @property-read Classes                                                                                 $class
@@ -31,75 +32,71 @@ final class Attributes implements Stringable
     // private array $attributes = [];
 
     /**
-     * @param array<string,null|array<array-key, ?string>|BackedEnum|scalar|Stringable|UnitEnum>|Attributes $attributes
+     * @param mixed ...$attributes
      */
-    public function __construct( null|array|Attributes $attributes = null )
+    public function __construct( mixed ...$attributes )
     {
-        if ( $attributes ) {
-            $this->merge( $attributes );
-        }
+        $this->merge( ...$attributes );
     }
 
     /**
-     * @param array<string,null|array<array-key, ?string>|BackedEnum|scalar|Stringable|UnitEnum>|Attributes $attributes
+     * @param mixed ...$attributes
      *
      * @return $this
      */
-    public function merge( Attributes|array $attributes ) : self
+    public function merge( mixed ...$attributes ) : self
     {
-        if ( $attributes instanceof Attributes ) {
-            $attributes = $attributes->attributeArray();
-        }
-
-        foreach ( $attributes as $attribute => $value ) {
-            $attribute = $this->name( $attribute );
-            if ( $attribute === 'id' ) {
-                /** @var null|BackedEnum|string|Stringable|UnitEnum $value */
-                $this->id( $value );
-            }
-            elseif ( $attribute === 'classes' ) {
-                $value = \is_array( $value ) ? $value : [$value];
-
-                $this->class( ...$value );
-            }
-            elseif ( $attribute === 'styles' ) {
-                $value = \is_array( $value ) ? $value : [$value];
-                /** @var array<array-key, null|array<string,string>|string> $value */
-                $this->style( ...$value );
-            }
-            else {
-                $this->{$attribute} = $value ?? true;
-            }
+        foreach ( $this->parse( $attributes ) as $attribute => $value ) {
+            $this->setAttribute( $attribute, $value );
         }
 
         return $this;
     }
 
+    private function setAttribute(
+        string $attribute,
+        mixed  $value,
+    ) : void {
+        if ( $value === null ) {
+            dump( [__METHOD__ => "{$attribute} is ".\gettype( $value )] );
+            return;
+        }
+
+        if ( \is_bool( $value ) ) {
+            $this->{$attribute} = $value;
+            return;
+        }
+
+        if ( $attribute === 'classes' ) {
+            // @phpstan-ignore-next-line
+            $this->class( ...as_array( $value ) );
+            return;
+        }
+
+        if ( $attribute === 'styles' ) {
+            // @phpstan-ignore-next-line
+            $this->style( ...as_array( $value ) );
+            return;
+        }
+
+        if ( $attribute === 'id' ) {
+            // @phpstan-ignore-next-line
+            $this->id( $value );
+            return;
+        }
+
+        $this->{$attribute} = $value;
+    }
+
     /**
-     * @param string                                                                   $attribute
-     * @param null|array<array-key, ?string>|bool|float|int|string|Stringable|UnitEnum $value
+     * @param mixed ...$attribute
      *
      * @return $this
      */
-    public function set(
-        string                                               $attribute,
-        array|int|float|string|bool|null|UnitEnum|Stringable $value = null,
-    ) : self {
-        $attribute = $this->name( $attribute );
-
-        if ( $attribute === 'id' ) {
-            /** @var null|BackedEnum|string|Stringable|UnitEnum $value */
-            $this->id( $value );
-        }
-        elseif ( $attribute === 'classes' ) {
-            $this->class( $value );
-        }
-        elseif ( $attribute === 'styles' ) {
-            /** @var array<array-key, null|array<string,?string>|string> $value */
-            $this->style( $value );
-        }
-        else {
-            $this->{$attribute} = $value ?? true;
+    public function set( mixed ...$attribute ) : self
+    {
+        foreach ( $attribute as $key => $value ) {
+            $this->setAttribute( $this->name( $key ), $value );
         }
         return $this;
     }
@@ -146,15 +143,10 @@ final class Attributes implements Stringable
         return ( new Styles( $this->styles, $this ) )->add( $styles );
     }
 
-    // public function __set( string $name, mixed $value ) : void
-    // {
-    //     throw new LogicException( $this::class."::\${$name} cannot be dynamically set." );
-    // }
-
     /**
      * @param string $name
      *
-     * @return array<string, array<array-key, string>|bool|string>|Classes|Styles
+     * @return array<string, null|array<array-key, string>|bool|int|string>|Classes|Styles
      */
     public function __get( string $name ) : Classes|Styles|array
     {
@@ -175,13 +167,13 @@ final class Attributes implements Stringable
      */
     public function get( string $attribute ) : ?string
     {
-        $get = $this->name( $attribute );
+        $attribute = $this->name( $attribute );
 
-        return match ( $get ) {
+        return match ( $attribute ) {
             'id'      => $this->id,
             'classes' => Classes::resolve( $this->classes ),
             'styles'  => Styles::resolve( $this->styles ),
-            default   => $this->{$get} ?? null,
+            default   => $this->{$attribute} ?? null,
         };
     }
 
@@ -196,8 +188,6 @@ final class Attributes implements Stringable
         else {
             unset( $this->{$attribute} );
         }
-        dump( $this );
-
         return $value;
     }
 
@@ -225,18 +215,20 @@ final class Attributes implements Stringable
                 $value = Styles::resolve( $value );
             }
 
+            \assert(
+                \is_string( $value ) || $value === true,
+                __METHOD__.' $value should be a string|true at this point, '.\gettype( $value ).' provided.',
+            );
+
             if ( $raw ) {
-                $attributes[$attribute] = $value;
+                $attributes[$attribute] = $attribute;
 
                 continue;
             }
 
-            if ( $value === true ) {
-                $attributes[$attribute] = $attribute;
-            }
-            else {
-                $attributes[$attribute] = "{$attribute}=\"{$value}\"";
-            }
+            $attributes[$attribute] = $value === true
+                    ? $attribute
+                    : "{$attribute}=\"{$value}\"";
         }
 
         return $attributes;
@@ -253,63 +245,6 @@ final class Attributes implements Stringable
     {
         $attributes = \implode( ' ', $this->resolveAttributes() );
         return $attributes ? " {$attributes}" : '';
-    }
-
-    /**
-     * Return a normalized, but unprocessed version of {@see self::$attributes}.
-     *
-     * @return array<string, array<array-key, string>|bool|string>
-     */
-    private function attributeArray() : array
-    {
-        $attributes = [];
-
-        /** @var iterable<string, BackedEnum|scalar|Stringable|UnitEnum> $this */
-        foreach ( $this as $attribute => $value ) {
-            if ( $value instanceof BackedEnum ) {
-                $value = $value->value;
-            }
-
-            if ( $value instanceof UnitEnum ) {
-                $value = $value->name;
-            }
-
-            if ( $value instanceof Stringable || \is_numeric( $value ) ) {
-                $value = (string) $value;
-            }
-
-            \assert(
-                \is_array( $value ) || \is_string( $value ) || \is_null( $value ) || \is_bool( $value ),
-                "Attribute '{$attribute}' can only be null|array|string|bool. ".\gettype( $value ).' provided.',
-            );
-
-            $attributes[$attribute] = $value;
-        }
-
-        return $attributes;
-    }
-
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    private function name( int|string $string ) : string
-    {
-        \assert(
-            \is_string( $string ),
-            'Attribute names must be strings, '.\gettype( $string ).' provided.',
-        );
-
-        $string = \strtolower( \trim( $string ) );
-
-        $string = \trim( (string) \preg_replace( '/[^a-z0-9-]+/i', '-', $string ), '-' );
-
-        return match ( $string ) {
-            'class' => 'classes',
-            'style' => 'styles',
-            default => $string,
-        };
     }
 
     /**
@@ -355,7 +290,7 @@ final class Attributes implements Stringable
         ) ) {
             foreach ( $attrMatches as $attr ) {
                 $name  = ( $attr[1] ?? false ) ?: $attr[3] ?? null;
-                $value = ( $attr[2] ?? false ) ?: $name;
+                $value = ( $attr[2] ?? false ) ?: true;
 
                 if ( ! $name ) {
                     continue;
@@ -366,5 +301,100 @@ final class Attributes implements Stringable
         }
 
         return new self( $attributes );
+    }
+
+    /**
+     * @param array<array-key, mixed> $arguments
+     *
+     * @return array<string, mixed>
+     */
+    private function parse( array $arguments ) : array
+    {
+        $attributes = [];
+
+        foreach ( $arguments as $key => $attribute ) {
+            $attribute = $attribute instanceof Attributes
+                    ? $attribute->attributeArray()
+                    : $attribute;
+
+            if ( \is_int( $key ) && \is_array( $attribute ) ) {
+                $attributes = [...$attributes, ...$this->parse( $attribute )];
+
+                continue;
+            }
+
+            if ( $attribute === null || $attribute === [] ) {
+                continue;
+            }
+
+            $attributes[$this->name( $key )] = $attribute;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    private function name( int|string $string ) : string
+    {
+        \assert(
+            \is_string( $string ),
+            'Attribute names must be strings, '.\gettype( $string ).' provided.',
+        );
+
+        $string = \strtolower( \trim( $string ) );
+
+        $string = \trim( (string) \preg_replace( '/[^a-z0-9-]+/i', '-', $string ), '-' );
+
+        return match ( $string ) {
+            'class' => 'classes',
+            'style' => 'styles',
+            default => $string,
+        };
+    }
+
+    /**
+     * Return a normalized, but unprocessed version of {@see self::$attributes}.
+     *
+     * @return array<string, null|array<array-key, string>|bool|int|string>
+     */
+    private function attributeArray() : array
+    {
+        $attributes = [];
+
+        // @phpstan-ignore-next-line
+        foreach ( $this as $attribute => $value ) {
+            /** @noinspection PhpDuplicateMatchArmBodyInspection */
+            $value = match ( true ) {
+                $value === null              => $value,
+                $value === []                => $value,
+                \is_string( $value )         => $value,
+                \is_bool( $value )           => $value,
+                \is_numeric( $value )        => (string) $value,
+                $value instanceof Printable  => $value->toString(),
+                $value instanceof Stringable => (string) $value,
+                $value instanceof BackedEnum => $value->value,
+                $value instanceof UnitEnum   => $value->name,
+                \is_array( $value ) && ( function() use ( $value ) {
+                    foreach ( $value as $string ) {
+                        if ( ! \is_string( $string ) ) {
+                            return false;
+                        }
+                    }
+                    return true;
+                } )()   => $value,
+                default => throw new InvalidArgumentException(
+                    $this::class.' does not accept a value of type '.\gettype( $value ).'.',
+                ),
+            };
+
+            /** @var null|array<string>|bool|int|string $value */
+            $attributes[$attribute] = $value;
+        }
+
+        return $attributes;
     }
 }

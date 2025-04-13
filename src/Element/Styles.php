@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Core\View\Element;
 
 use Stringable;
@@ -181,30 +183,30 @@ final class Styles implements Stringable
         return \array_filter( $styles );
     }
 
-    public static function sort( array $styles, ?array $priorityKeys = null ) : array
-    {
-        $sorted = [];
-
-        $priorityKeys ??= [
-            'not-found',
-            'error',
-            'warning',
-        ];
-
-        // Add preferred keys in order
-        foreach ( $priorityKeys as $key ) {
-            if ( \array_key_exists( $key, $styles ) ) {
-                $sorted[$key] = $styles[$key];
-                unset( $styles[$key] );
-            }
-        }
-
-        // Sort remaining keys alphabetically
-        if ( ! empty( $styles ) ) {
-            \ksort( $styles );
-            $sorted += $styles;
-        }
-
-        return $sorted;
-    }
+    // public static function sort( array $styles, ?array $priorityKeys = null ) : array
+    // {
+    //     $sorted = [];
+    //
+    //     $priorityKeys ??= [
+    //         'not-found',
+    //         'error',
+    //         'warning',
+    //     ];
+    //
+    //     // Add preferred keys in order
+    //     foreach ( $priorityKeys as $key ) {
+    //         if ( \array_key_exists( $key, $styles ) ) {
+    //             $sorted[$key] = $styles[$key];
+    //             unset( $styles[$key] );
+    //         }
+    //     }
+    //
+    //     // Sort remaining keys alphabetically
+    //     if ( ! empty( $styles ) ) {
+    //         \ksort( $styles );
+    //         $sorted += $styles;
+    //     }
+    //
+    //     return $sorted;
+    // }
 }
