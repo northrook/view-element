@@ -6,36 +6,35 @@ namespace Core\View\Element;
 
 use Core\View\Element;
 use InvalidArgumentException;
-use UnitEnum;
 use function Support\escape_url;
 
 trait StaticElements
 {
     /**
-     * @param string                                                    $href
-     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     * @param string $href
+     * @param mixed  ...$attributes
      *
      * @return Element
      */
     public static function link(
-        string                                                  $href,
-        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
+        string   $href,
+        mixed ...$attributes,
     ) : Element {
         $attributes['href'] = escape_url( $href );
         return new Element( 'link', ...$attributes );
     }
 
     /**
-     * @param ?string                                                   $src
-     * @param ?string                                                   $inline
-     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     * @param ?string $src
+     * @param ?string $inline
+     * @param mixed   ...$attributes
      *
      * @return Element
      */
     public static function script(
-        ?string                                                 $src = null,
-        ?string                                                 $inline = null,
-        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
+        ?string  $src = null,
+        ?string  $inline = null,
+        mixed ...$attributes,
     ) : Element {
         if ( $src && ! $inline ) {
             $attributes['src'] = escape_url( $src );
@@ -48,16 +47,16 @@ trait StaticElements
     }
 
     /**
-     * @param ?string                                                   $href
-     * @param ?string                                                   $inline
-     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     * @param ?string $href
+     * @param ?string $inline
+     * @param mixed   ...$attributes
      *
      * @return Element
      */
     public static function style(
-        ?string                                                 $href = null,
-        ?string                                                 $inline = null,
-        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
+        ?string  $href = null,
+        ?string  $inline = null,
+        mixed ...$attributes,
     ) : Element {
         if ( $href && ! $inline ) {
             $attributes['href'] = escape_url( $href );
@@ -81,20 +80,20 @@ trait StaticElements
     }
 
     /**
-     * @param string                                                    $src
-     * @param string                                                    $alt
-     * @param null|string|string[]                                      $srcset
-     * @param null|string|string[]                                      $sizes
-     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     * @param string               $src
+     * @param string               $alt
+     * @param null|string|string[] $srcset
+     * @param null|string|string[] $sizes
+     * @param mixed                ...$attributes
      *
      * @return Element
      */
     public static function img(
-        string                                                  $src,
-        string                                                  $alt = '',
-        null|string|array                                       $srcset = null,
-        null|string|array                                       $sizes = null,
-        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
+        string            $src,
+        string            $alt = '',
+        null|string|array $srcset = null,
+        null|string|array $sizes = null,
+        mixed          ...$attributes,
     ) : Element {
         $attributes['src'] = escape_url( $src );
         $attributes['alt'] = $alt;
@@ -114,22 +113,22 @@ trait StaticElements
     }
 
     /**
-     * @param null|string                                               $src
-     * @param null|string                                               $srcset
-     * @param null|string                                               $media
-     * @param null|string                                               $type
-     * @param null|string|string[]                                      $sizes
-     * @param null|array<array-key, ?string>|Attributes|scalar|UnitEnum ...$attributes
+     * @param null|string          $src
+     * @param null|string          $srcset
+     * @param null|string          $media
+     * @param null|string          $type
+     * @param null|string|string[] $sizes
+     * @param mixed                ...$attributes
      *
      * @return Element
      */
     public static function source(
-        ?string                                                 $src = null,
-        ?string                                                 $srcset = null,
-        ?string                                                 $media = null,
-        ?string                                                 $type = null,
-        null|string|array                                       $sizes = null,
-        Attributes|array|bool|string|int|float|UnitEnum|null ...$attributes,
+        ?string           $src = null,
+        ?string           $srcset = null,
+        ?string           $media = null,
+        ?string           $type = null,
+        null|string|array $sizes = null,
+        mixed          ...$attributes,
     ) : Element {
         if ( $media ) {
             $attributes['media'] = $media;
