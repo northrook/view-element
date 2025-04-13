@@ -92,39 +92,31 @@ final class Attributes implements Stringable
     public function set(
         int|string $attribute,
         mixed      $value,
-    ) : void {
-        /** @var string $attribute */
-        $attribute = $this->name( $attribute );
-
+    ) : self {
         if ( $value === null ) {
             dump( [__METHOD__ => "{$attribute} is ".\gettype( $value )] );
-            return;
+            return $this;
         }
 
-        if ( \is_bool( $value ) ) {
-            $this->{$attribute} = $value;
-            return;
-        }
+        /** @var string $attribute */
+        $attribute = $this->name( $attribute );
 
         if ( $attribute === 'classes' ) {
             // @phpstan-ignore-next-line
             $this->class( ...as_array( $value ) );
-            return;
         }
-
-        if ( $attribute === 'styles' ) {
+        elseif ( $attribute === 'styles' ) {
             // @phpstan-ignore-next-line
             $this->style( ...as_array( $value ) );
-            return;
         }
-
-        if ( $attribute === 'id' ) {
+        elseif ( $attribute === 'id' ) {
             // @phpstan-ignore-next-line
             $this->id( $value );
-            return;
         }
-
-        $this->{$attribute} = $value;
+        else {
+            $this->{$attribute} = $value;
+        }
+        return $this;
     }
 
     /**
@@ -139,7 +131,7 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param null|bool|float|int|string|Stringable|UnitEnum ...$add
+     * @param null|scalar|Stringable|UnitEnum ...$add
      *
      * @return self
      */
@@ -149,11 +141,11 @@ final class Attributes implements Stringable
     }
 
     /**
-     * @param null|string|string[] ...$add
+     * @param null|array<null|scalar|Stringable|UnitEnum>|scalar|Stringable|UnitEnum ...$add
      *
      * @return self
      */
-    public function style( null|string|array ...$add ) : self
+    public function style( bool|float|int|string|Stringable|UnitEnum|null|array ...$add ) : self
     {
         $styles = [];
 
@@ -174,15 +166,13 @@ final class Attributes implements Stringable
      *
      * @return array<string, null|array<array-key, string>|bool|int|string>|Classes|Styles
      */
-    public function __get( string $name ) : Classes|Styles|array
+    public function __get( string $name ) : Classes|Styles|array|null
     {
         return match ( $this->name( $name ) ) {
             'classes' => new Classes( $this->classes, $this ),
             'styles'  => new Styles( $this->styles, $this ),
             'array'   => $this->attributeArray(),
-            default   => throw new InvalidArgumentException(
-                'Warning: Undefined property: '.$this::class."::\${$name}",
-            ),
+            default   => null,
         };
     }
 
@@ -228,17 +218,19 @@ final class Attributes implements Stringable
 
         foreach ( $this->attributeArray() as $attribute => $value ) {
             // Skip empty classes and styles
-            if ( $value === false || ( \is_array( $value ) && empty( \array_filter( $value ) ) ) ) {
+            if ( $value === null || $value === false || ( \is_array( $value ) && empty( \array_filter( $value ) ) ) ) {
                 continue;
             }
 
-            if ( $attribute === 'classes' ) {
-                \assert( \is_array( $value ) );
-                $value = Classes::resolve( $value );
-            }
-            if ( $attribute === 'styles' ) {
-                \assert( \is_array( $value ) );
-                $value = Styles::resolve( $value );
+            if ( \is_array( $value ) ) {
+                if ( $attribute === 'classes' ) {
+                    $value     = Classes::resolve( $value );
+                    $attribute = 'class';
+                }
+                if ( $attribute === 'styles' ) {
+                    $value     = Styles::resolve( $value );
+                    $attribute = 'style';
+                }
             }
 
             \assert(
@@ -247,7 +239,7 @@ final class Attributes implements Stringable
             );
 
             if ( $raw ) {
-                $attributes[$attribute] = $attribute;
+                $attributes[$attribute] = $value;
 
                 continue;
             }
