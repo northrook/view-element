@@ -161,6 +161,26 @@ final class Attributes implements Stringable
     }
 
     /**
+     * @param string $attribute
+     * @param mixed  $value
+     *
+     * @return bool
+     */
+    public function has( string $attribute, mixed $value = null ) : bool
+    {
+        // Get attribute by name, or false if unset
+        $attribute = $this->{$this->name( $attribute )} ?? false;
+
+        // Check against value if requested
+        if ( $value ) {
+            return $attribute === $value;
+        }
+
+        // If the attribute is anything but false, consider it set
+        return $attribute !== false;
+    }
+
+    /**
      * @param 'class'|'id'|'style'|string $attribute
      *
      * @return null|string
