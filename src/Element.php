@@ -40,19 +40,20 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                     $tag
-     * @param null[]|scalar[]|Stringable[]   $content
-     * @param array<string,mixed>|Attributes $attributes
-     * @param mixed                          ...$set
+     * @param string|Tag                                          $tag
+     * @param null|null[]|scalar|scalar[]|Stringable|Stringable[] $content
+     * @param array<string,mixed>|Attributes                      $attributes
+     * @param mixed                                               ...$set
      */
     public function __construct(
-        string|Tag                   $tag = 'div',
-        null|array|string|Stringable $content = null,
-        null|array|Attributes        $attributes = null,
-        mixed                     ...$set,
+        string|Tag                              $tag = 'div',
+        null|array|string|float|bool|Stringable $content = null,
+        null|array|Attributes                   $attributes = null,
+        mixed                                ...$set,
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $this->content    = new Content( ...(array) $content );
+        $content          = \is_array( $content ) ? $content : [$content];
+        $this->content    = new Content( ...$content );
         $this->attributes = ( new Attributes( $attributes ) )->merge( $set );
     }
 
@@ -61,6 +62,7 @@ class Element extends View
         if ( $this->tag->isSelfClosing() ) {
             return $this->tag->getOpeningTag( $this->attributes );
         }
+
         return \implode(
             $separator,
             [
