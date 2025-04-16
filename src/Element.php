@@ -40,21 +40,21 @@ class Element extends View
     public readonly Content $content;
 
     /**
-     * @param string|Tag                                          $tag
-     * @param null|null[]|scalar|scalar[]|Stringable|Stringable[] $content
-     * @param array<string,mixed>|Attributes                      $attributes
-     * @param mixed                                               ...$set
+     * @param string|Tag                                                     $tag
+     * @param null|array<array-key,null|scalar|Stringable>|scalar|Stringable $content
+     * @param Attributes|mixed                                               ...$attributes
      */
     public function __construct(
-        string|Tag                              $tag = 'div',
-        null|array|string|float|bool|Stringable $content = null,
-        null|array|Attributes                   $attributes = null,
-        mixed                                ...$set,
+        string|Tag                                  $tag = 'div',
+        array|null|string|int|float|bool|Stringable $content = null,
+        mixed                                    ...$attributes,
     ) {
-        $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $content          = \is_array( $content ) ? $content : [$content];
-        $this->content    = new Content( ...$content );
-        $this->attributes = ( new Attributes( $attributes ) )->merge( $set );
+        $this->tag     = $tag instanceof Tag ? $tag : Tag::from( $tag );
+        $content       = \is_array( $content ) ? $content : [$content];
+        $this->content = new Content( ...$content );
+
+
+        $this->attributes = ( new Attributes( ...$attributes ) );
     }
 
     protected function build( string $separator = '' ) : string

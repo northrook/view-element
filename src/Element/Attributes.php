@@ -87,7 +87,7 @@ final class Attributes implements Stringable
      * @param int|string $attribute
      * @param mixed      $value
      *
-     * @return void
+     * @return self
      */
     public function set(
         int|string $attribute,
@@ -210,7 +210,7 @@ final class Attributes implements Stringable
     /**
      * @param bool $raw
      *
-     * @return array<string, string>
+     * @return ($raw is true ? array<string, bool|string> : array<string, string>)
      */
     public function resolveAttributes( bool $raw = false ) : array
     {
@@ -227,7 +227,7 @@ final class Attributes implements Stringable
                     $value     = Classes::resolve( $value );
                     $attribute = 'class';
                 }
-                if ( $attribute === 'styles' ) {
+                elseif ( $attribute === 'styles' ) {
                     $value     = Styles::resolve( $value );
                     $attribute = 'style';
                 }
@@ -331,11 +331,16 @@ final class Attributes implements Stringable
         $attributes = [];
 
         foreach ( $arguments as $key => $attribute ) {
-            $attribute = $attribute instanceof Attributes
-                    ? $attribute->attributeArray()
-                    : $attribute;
+            // Determine if we should parse nested attribute arguments
+            $parse = \is_int( $key );
 
-            if ( \is_int( $key ) && \is_array( $attribute ) ) {
+            // Always parse nested Attributes->array
+            if ( $attribute instanceof Attributes ) {
+                $parse     = true;
+                $attribute = $attribute->attributeArray();
+            }
+
+            if ( $parse && \is_array( $attribute ) ) {
                 $attributes = [...$attributes, ...$this->parse( $attribute )];
 
                 continue;
