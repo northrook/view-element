@@ -43,7 +43,7 @@ trait StaticElements
             unset( $attributes['src'] );
         }
 
-        return new Element( 'script', content : $inline, set : $attributes );
+        return new Element( 'script', $inline, ...$attributes );
     }
 
     /**
@@ -61,19 +61,12 @@ trait StaticElements
         if ( $href && ! $inline ) {
             $attributes['href'] = escape_url( $href );
             $attributes['rel']  = 'stylesheet';
-            return new Element(
-                tag        : 'link',
-                attributes : $attributes,
-            );
+            return new Element( 'link', ...$attributes );
         }
 
         if ( $inline ) {
             unset( $attributes['href'] );
-            return new Element(
-                tag        : 'style',
-                content    : $inline,
-                attributes : $attributes,
-            );
+            return new Element( 'style', $inline, ...$attributes );
         }
 
         throw new InvalidArgumentException();
@@ -106,10 +99,7 @@ trait StaticElements
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
 
-        return new Element(
-            tag        : 'img',
-            attributes : $attributes,
-        );
+        return new Element( 'img', ...$attributes );
     }
 
     /**
@@ -149,9 +139,7 @@ trait StaticElements
         if ( $sizes ) {
             $attributes['sizes'] = \is_array( $sizes ) ? \implode( ', ', $sizes ) : $sizes;
         }
-        return new Element(
-            tag        : 'source',
-            attributes : $attributes,
-        );
+
+        return new Element( 'source', ...$attributes );
     }
 }
