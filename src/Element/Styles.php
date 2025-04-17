@@ -46,9 +46,12 @@ final class Styles implements Stringable
     }
 
     /**
+     * Will not override existing styles by default.
+     *
      * @param mixed $style
      * @param bool  $prepend
      * @param bool  $append
+     * @param bool  $override
      *
      * @return Attributes
      */
@@ -56,16 +59,23 @@ final class Styles implements Stringable
         mixed $style,
         bool  $prepend = false,
         bool  $append = false,
+        bool  $override = false,
     ) : Attributes {
         if ( ! $style ) {
             return $this->attributes;
         }
 
-        // Cast and filter to array of values
+        // Cast and filter to an array of values
         foreach ( $this::arrayFrom( $style ) as $name => $value ) {
+            if ( $override ) {
+                $this->style[$name] = $value;
+
+                continue;
+            }
+
             // Append by default
             if ( ! $prepend && ! $append ) {
-                $this->style[$name] = $value;
+                $this->style[$name] ??= $value;
 
                 continue;
             }
@@ -154,7 +164,7 @@ final class Styles implements Stringable
 
         foreach ( $style as $name => $value ) {
             //
-            // Normalize, and skip if empty
+            // Normalize and skip if empty
             if ( ! $value = \trim( (string) $value, " \n\r\t\v\0," ) ) {
                 continue;
             }
