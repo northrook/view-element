@@ -11,21 +11,10 @@ use Core\View\Element\{
     Tag,
 };
 use Core\Interface\View;
-use Stringable, UnitEnum;
+use Stringable;
 use function Support\variadic_argument;
 
-// /**
-//  * @param string|Tag                                                $tag
-//  * @param null|array|string|Stringable                              $content
-//  * @param null|array<array-key, ?string>|scalar|Stringable|UnitEnum ...$set
-//  */
-// public function __construct(
-//         string|Tag $tag = 'div',
-//         mixed   ...$set,
-// ) {
-
 /**
- * @phpstan-type AttributeShape null|array<array-key, ?string>|scalar|Stringable|UnitEnum
  */
 class Element extends View
 {
@@ -49,21 +38,36 @@ class Element extends View
         array|null|string|int|float|bool|Stringable $content = null,
         mixed                                    ...$attributes,
     ) {
-        $this->tag     = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $content       = \is_array( $content ) ? $content : [$content];
-        $this->content = new Content( ...$content );
-
-
-        $this->attributes = ( new Attributes( ...$attributes ) );
+        $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
+        $this->content    = new Content( ...\is_array( $content ) ? $content : [$content] );
+        $this->attributes = new Attributes( ...$attributes );
     }
 
-    protected function build( string $separator = '' ) : string
-    {
-        if ( $this->tag->isSelfClosing() ) {
-            return $this->tag->getOpeningTag( $this->attributes );
+    protected function build() : void {}
+
+    /**
+     * @param string $separator
+     * @param bool   $rebuild
+     *
+     * @return string
+     */
+    final public function render(
+        string $separator = EMPTY_STRING,
+        bool   $rebuild = false,
+    ) : string {
+        if ( $rebuild ) {
+            $this->html = null;
         }
 
-        return \implode(
+        if ( ! $this->html ) {
+            $this->build();
+        }
+
+        if ( $this->tag->isSelfClosing() ) {
+            return $this->html ??= $this->tag->getOpeningTag( $this->attributes );
+        }
+
+        return $this->html ??= \implode(
             $separator,
             [
                 $this->tag->getOpeningTag( $this->attributes ),
@@ -71,15 +75,6 @@ class Element extends View
                 $this->tag->getClosingTag(),
             ],
         );
-    }
-
-    final public function render( bool $rebuild = false ) : string
-    {
-        if ( $rebuild ) {
-            $this->html = null;
-        }
-
-        return $this->html ??= $this->build();
     }
 
     public function __toString() : string
@@ -98,17 +93,17 @@ class Element extends View
      *
      * Underscores get converted to hyphens.
      *
-     * @param ?string                                   $id
-     * @param ?string                                   $class
-     * @param ?string                                   $style
-     * @param null|array<array-key, string>|bool|string ...$attributes
+     * @param mixed $id
+     * @param mixed $class
+     * @param mixed $style
+     * @param mixed ...$attributes
      *
      * @return $this
      */
     final public function attributes(
-        ?string  $id = null,
-        ?string  $class = null,
-        ?string  $style = null,
+        mixed    $id = null,
+        mixed    $class = null,
+        mixed    $style = null,
         mixed ...$attributes,
     ) : self {
         $this->attributes->merge( ...variadic_argument( \get_defined_vars() ) );
