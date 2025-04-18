@@ -43,6 +43,17 @@ class Element extends View
         $this->attributes = new Attributes( ...$attributes );
     }
 
+    /**
+     * @param mixed ...$attributes
+     *
+     * @return $this
+     */
+    public function __invoke( mixed ...$attributes ) : self
+    {
+        $this->attributes->merge( ...$attributes );
+        return $this;
+    }
+
     protected function build() : void {}
 
     /**
