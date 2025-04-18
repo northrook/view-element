@@ -15,6 +15,7 @@ use Stringable;
 use function Support\variadic_argument;
 
 /**
+ *
  */
 class Element extends View
 {
@@ -41,17 +42,6 @@ class Element extends View
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
         $this->content    = new Content( ...\is_array( $content ) ? $content : [$content] );
         $this->attributes = new Attributes( ...$attributes );
-    }
-
-    /**
-     * @param mixed ...$attributes
-     *
-     * @return $this
-     */
-    public function __invoke( mixed ...$attributes ) : self
-    {
-        $this->attributes->merge( ...$attributes );
-        return $this;
     }
 
     protected function build() : void {}
@@ -148,8 +138,8 @@ class Element extends View
         return $this;
     }
 
-    final public function hasContent() :bool
+    final public function hasContent() : bool
     {
-        return $this->content !== null;
+        return $this->content->has();
     }
 }
