@@ -147,4 +147,9 @@ class Element extends View
 
         return $this;
     }
+
+    final public function hasContent() :bool
+    {
+        return $this->content !== null;
+    }
 }

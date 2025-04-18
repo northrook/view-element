@@ -78,6 +78,14 @@ final class Content implements Stringable
         return $this;
     }
 
+    public function has( null|int|string $key = null ) : bool
+    {
+        if ( $key === null ) {
+            return ! empty( \array_filter( $this->content ) );
+        }
+        return \array_key_exists( $key, \array_filter( $this->content ) );
+    }
+
     public function __toString() : string
     {
         return \implode( PHP_EOL, $this->content );
