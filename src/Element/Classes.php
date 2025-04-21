@@ -49,10 +49,10 @@ final class Classes implements Stringable
         bool  $prepend = false,
         bool  $append = false,
     ) : Attributes {
-        // Cast and filter to array of values
+        // Cast and filter to an array of values
         foreach ( \array_filter( (array) $class ) as $value ) {
             //
-            // Normalize, and skip if empty
+            // Normalize and skip if empty
             if ( ! $selector = \strtolower( \trim( as_string( $value ) ) ) ) {
                 continue;
             }

@@ -58,7 +58,7 @@ final class Attributes implements Stringable
      */
     public function has( string $attribute, mixed $value = null ) : bool
     {
-        // Get attribute by name, or false if unset
+        // Get attribute by name or false if unset
         $attribute = $this->{$this->name( $attribute )} ?? false;
 
         // Check against value if requested
@@ -255,7 +255,7 @@ final class Attributes implements Stringable
     /**
      * Return a string of fully resolved attributes.
      *
-     * Will be prefixed with a single whitespace unless empty.
+     * Will be prefixed with a single white-space unless empty.
      *
      * @return string
      */
