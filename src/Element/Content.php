@@ -13,11 +13,11 @@ final class Content implements Stringable
     private array $content;
 
     /**
-     * @param null|scalar|Stringable ...$content
+     * @param null|array<array-key, null|scalar|Stringable>|scalar|Stringable $content
      */
-    public function __construct( string|float|int|bool|Stringable|null ...$content )
+    public function __construct( array|null|string|int|float|bool|Stringable $content = null )
     {
-        $this->content = $content;
+        $this->content = \is_array( $content ) ? $content : [$content];
     }
 
     /**
