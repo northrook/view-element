@@ -25,9 +25,9 @@ class Element extends View
 
     public readonly Tag $tag;
 
-    public readonly Attributes $attributes;
+    public Attributes $attributes;
 
-    public readonly Content $content;
+    public Content $content;
 
     /**
      * @param string|Tag                                                     $tag
@@ -40,7 +40,7 @@ class Element extends View
         mixed                                    ...$attributes,
     ) {
         $this->tag        = $tag instanceof Tag ? $tag : Tag::from( $tag );
-        $this->content    = new Content( ...\is_array( $content ) ? $content : [$content] );
+        $this->content    = new Content( $content );
         $this->attributes = new Attributes( ...$attributes );
     }
 
