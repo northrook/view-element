@@ -23,7 +23,7 @@ class Element extends View
 
     private ?string $html = null;
 
-    public readonly Tag $tag;
+    public Tag $tag;
 
     public Attributes $attributes;
 
