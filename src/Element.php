@@ -124,15 +124,21 @@ class Element extends View
             return $this;
         }
 
-        if ( ! \is_array( $content ) ) {
-            $content = [$content];
+        $array = [];
+
+        foreach ( \is_array( $content ) ? $content : [$content] as $key => $value ) {
+            if ( \is_int( $key ) ) {
+                $type = $value instanceof Stringable ? $value::class : \gettype( $value );
+                $key  = "{$key}:({$type})";
+            }
+            $array[$key] = $value;
         }
 
         if ( $prepend ) {
-            $this->content->prepend( ...$content );
+            $this->content->prepend( ...$array );
         }
         else {
-            $this->content->append( ...$content );
+            $this->content->append( ...$array );
         }
 
         return $this;
